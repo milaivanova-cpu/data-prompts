@@ -1,0 +1,1863 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Промпт библиотека — Образователно НПО v3</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0c0f0e; --bg2:#141a17; --bg3:#1c2420; --bg4:#101510;
+  --border:rgba(255,255,255,0.07); --border-hi:rgba(255,255,255,0.15);
+  --text:#edf0ec; --text2:#8fa89a; --text3:#4e6057;
+  --accent:#7ec98a; --accent2:#4fa35c;
+  --t-train:#1e3326; --t-train-c:#7ec98a;
+  --t-alumni:#1e2c3a; --t-alumni-c:#7eb8e8;
+  --t-fund:#2d2416;  --t-fund-c:#e8c47e;
+  --t-mkt:#2a1e1e;   --t-mkt-c:#e88a7e;
+  --t-rec:#271e30;   --t-rec-c:#c48ae8;
+  --t-mixed:#1e1e30; --t-mixed-c:#a0aadf;
+  --t-gen:#1e2020;   --t-gen-c:#a0b8b0;
+  --t-part:#1e2a20;  --t-part-c:#88d4a8;
+  --t-events:#2a2018;--t-events-c:#e8b87e;
+  --t-content:#1e2630;--t-content-c:#88b8e8;
+  --t-projects:#252018;--t-projects-c:#d4c87e;
+  --out-text:#1a2e1e;  --out-text-c:#7ec98a;
+  --out-table:#2d2416; --out-table-c:#e8c47e;
+  --out-json:#1e1e2e;  --out-json-c:#a0aadf;
+  --priv:#2e1e1e;      --priv-c:#e8a07e;
+}
+
+/* ── 4D HOW-TO SECTIONS ── */
+.d4-section{margin-bottom:8px;border-radius:6px;overflow:hidden;}
+.d4-section:last-child{margin-bottom:0;}
+.d4-header{display:flex;align-items:center;gap:8px;padding:7px 11px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.04em;}
+.d4-header .d4-icon{font-size:13px;}
+.d4-header .d4-label{font-weight:500;}
+.d4-header .d4-sublabel{opacity:.65;font-size:9px;margin-left:2px;}
+.d4-section.desc  .d4-header{background:rgba(126,201,138,0.1); color:#7ec98a;}
+.d4-section.deleg .d4-header{background:rgba(160,170,223,0.1); color:#a0aadf;}
+.d4-section.disc  .d4-header{background:rgba(196,138,232,0.1); color:#c48ae8;}
+.d4-section.dil   .d4-header{background:rgba(232,199,126,0.1); color:#e8c47e;}
+.d4-body{padding:8px 11px;background:var(--bg4);font-size:12px;color:var(--text2);line-height:1.65;}
+.d4-body strong{color:var(--text);font-weight:600;}
+
+/* ── 4D INTRO PANEL ── */
+.d4-intro{margin:0 48px;border-bottom:1px solid var(--border);padding:20px 0 24px;}
+.d4-intro-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#a0aadf;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.d4-intro-title::after{content:'';flex:1;height:1px;background:rgba(160,170,223,0.2);}
+.d4-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.d4-card{border-radius:8px;padding:13px 14px;border:1px solid rgba(255,255,255,0.07);}
+.d4-card.desc  {background:rgba(126,201,138,0.07); border-color:rgba(126,201,138,0.15);}
+.d4-card.deleg {background:rgba(160,170,223,0.07); border-color:rgba(160,170,223,0.15);}
+.d4-card.disc  {background:rgba(196,138,232,0.07); border-color:rgba(196,138,232,0.15);}
+.d4-card.dil   {background:rgba(232,199,126,0.07); border-color:rgba(232,199,126,0.15);}
+.d4-card-icon{font-size:18px;margin-bottom:6px;}
+.d4-card-title{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;margin-bottom:4px;}
+.d4-card.desc  .d4-card-title{color:#7ec98a;}
+.d4-card.deleg .d4-card-title{color:#a0aadf;}
+.d4-card.disc  .d4-card-title{color:#c48ae8;}
+.d4-card.dil   .d4-card-title{color:#e8c47e;}
+.d4-card-desc{font-size:11.5px;color:var(--text2);line-height:1.6;}
+.d4-card-example{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);margin-top:6px;font-style:italic;}
+@media(max-width:768px){.d4-cards{grid-template-columns:repeat(2,1fr);}.d4-intro{margin:0;padding-left:20px;padding-right:20px;}}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Instrument Sans',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;}
+
+/* ── HEADER ── */
+.header{padding:52px 48px 36px;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+.header::before{content:'';position:absolute;top:-80px;right:-40px;width:420px;height:420px;background:radial-gradient(ellipse,rgba(126,201,138,0.055) 0%,transparent 68%);pointer-events:none;}
+.hl{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
+.header h1{font-family:'DM Serif Display',serif;font-size:clamp(26px,4vw,44px);font-weight:400;line-height:1.15;max-width:640px;margin-bottom:10px;}
+.header h1 em{font-style:italic;color:var(--accent);}
+.header p{color:var(--text2);font-size:14px;max-width:520px;line-height:1.8;}
+.meta-row{margin-top:20px;display:flex;gap:18px;flex-wrap:wrap;}
+.mpill{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;}
+.mpill b{color:var(--text2);font-weight:500;}
+
+/* ── QUICK START BANNER ── */
+.qs-banner{margin:0 48px;border-bottom:1px solid var(--border);padding:20px 0 24px;}
+.qs-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.qs-title::after{content:'';flex:1;height:1px;background:rgba(126,201,138,0.2);}
+.qs-steps{display:flex;gap:12px;flex-wrap:wrap;}
+.qs-step{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;flex:1;min-width:160px;max-width:220px;cursor:pointer;transition:border-color .15s,background .15s;}
+.qs-step:hover{border-color:rgba(126,201,138,0.3);background:var(--bg3);}
+.qs-step-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-bottom:4px;}
+.qs-step-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.qs-step-desc{font-size:11.5px;color:var(--text2);line-height:1.5;}
+.qs-step.highlight{border-color:rgba(126,201,138,0.35);background:var(--bg3);}
+
+/* ── FINDER ── */
+.finder{margin:0 48px;border-bottom:1px solid var(--border);padding:20px 0 24px;}
+.finder-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--t-mixed-c);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.finder-title::after{content:'';flex:1;height:1px;background:rgba(160,170,223,0.2);}
+.finder-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+.finder-q{font-size:13px;color:var(--text2);margin-bottom:8px;}
+.finder-btns{display:flex;gap:7px;flex-wrap:wrap;}
+.finder-btn{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-family:'Instrument Sans',sans-serif;font-size:12.5px;color:var(--text2);cursor:pointer;transition:all .15s;}
+.finder-btn:hover{background:var(--bg3);color:var(--text);}
+.finder-btn.sel{background:var(--bg3);border-color:var(--t-mixed-c);color:var(--t-mixed-c);}
+.finder-result{display:none;margin-top:12px;background:var(--bg2);border:1px solid rgba(160,170,223,0.2);border-radius:8px;padding:14px 16px;}
+.finder-result.show{display:block;}
+.finder-result-label{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;color:var(--t-mixed-c);margin-bottom:8px;letter-spacing:.08em;}
+.finder-cards{display:flex;gap:8px;flex-wrap:wrap;}
+.finder-card-chip{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 12px;font-size:12.5px;color:var(--text);cursor:pointer;transition:all .15s;}
+.finder-card-chip:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ── PRIVACY NOTICE ── */
+.priv-bar{margin:0 48px 0;background:var(--priv);border-bottom:1px solid rgba(232,160,126,0.15);padding:10px 16px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--priv-c);}
+.priv-bar strong{font-weight:600;}
+
+/* ── LAYOUT ── */
+.main{display:flex;min-height:calc(100vh - 300px);}
+
+/* ── SIDEBAR ── */
+.sidebar{width:224px;flex-shrink:0;padding:24px 16px;border-right:1px solid var(--border);position:sticky;top:0;height:fit-content;}
+.sb-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;}
+.fb{display:block;width:100%;text-align:left;background:none;border:1px solid transparent;padding:6px 10px;border-radius:6px;font-family:'Instrument Sans',sans-serif;font-size:12.5px;color:var(--text2);cursor:pointer;margin-bottom:2px;transition:all .15s;}
+.fb:hover{background:var(--bg3);color:var(--text);}
+.fb.active{background:var(--bg3);color:var(--accent);border-color:rgba(126,201,138,0.2);}
+.fc{float:right;font-family:'DM Mono',monospace;font-size:10.5px;color:var(--text3);}
+.dot-s{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:middle;}
+.sb-sep{height:1px;background:var(--border);margin:14px 0;}
+
+/* ── CONTENT ── */
+.content{flex:1;padding:22px 30px;}
+.search-wrap{position:relative;margin-bottom:20px;}
+.search-bar{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 16px 10px 36px;font-family:'Instrument Sans',sans-serif;font-size:13.5px;color:var(--text);outline:none;transition:border-color .2s;}
+.search-bar:focus{border-color:rgba(126,201,138,0.3);}
+.search-bar::placeholder{color:var(--text3);}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:15px;pointer-events:none;}
+
+.sec-head{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;margin-top:4px;display:flex;align-items:center;gap:8px;}
+.sec-head::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:28px;}
+
+/* ── CARD ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:border-color .18s,transform .12s,background .15s;}
+.card:hover{border-color:var(--border-hi);background:var(--bg3);transform:translateY(-1px);}
+.card.expanded{border-color:rgba(126,201,138,0.22);background:var(--bg3);}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px;gap:6px;}
+.tags{display:flex;gap:4px;flex-wrap:wrap;}
+.tag{font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:.04em;padding:2px 6px;border-radius:3px;text-transform:uppercase;white-space:nowrap;}
+.tag-train  {background:var(--t-train);  color:var(--t-train-c);}
+.tag-alumni {background:var(--t-alumni); color:var(--t-alumni-c);}
+.tag-fund   {background:var(--t-fund);   color:var(--t-fund-c);}
+.tag-mkt    {background:var(--t-mkt);    color:var(--t-mkt-c);}
+.tag-rec    {background:var(--t-rec);    color:var(--t-rec-c);}
+.tag-mixed  {background:var(--t-mixed);  color:var(--t-mixed-c);}
+.tag-gen    {background:var(--t-gen);    color:var(--t-gen-c);}
+.tag-part   {background:var(--t-part);   color:var(--t-part-c);}
+.tag-events {background:var(--t-events); color:var(--t-events-c);}
+.tag-content{background:var(--t-content);color:var(--t-content-c);}
+.tag-projects{background:var(--t-projects);color:var(--t-projects-c);}
+.tag-dim    {background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:var(--text3);}
+
+/* output type badge */
+.out-badge{font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;border-radius:3px;white-space:nowrap;}
+.out-text  {background:var(--out-text);  color:var(--out-text-c);}
+.out-table {background:var(--out-table); color:var(--out-table-c);}
+.out-json  {background:var(--out-json);  color:var(--out-json-c);}
+.out-mixed-badge{background:#1e2428;color:#88c4c8;}
+
+.card-acts{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.copy-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 8px;font-family:'DM Mono',monospace;font-size:9.5px;color:var(--text3);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent);}
+.copy-btn.ok{border-color:var(--accent);color:var(--accent);}
+.chevron{font-size:12px;color:var(--text3);transition:transform .2s;line-height:1;}
+.card.expanded .chevron{transform:rotate(180deg);}
+
+.card-title{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:4px;line-height:1.4;}
+.card-desc{font-size:12px;color:var(--text2);line-height:1.6;}
+
+/* privacy flag on card */
+.priv-flag{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;background:var(--priv);color:var(--priv-c);border-radius:3px;margin-top:6px;}
+
+/* expanded state */
+.card-body{display:none;margin-top:10px;}
+.card.expanded .card-body{display:block;}
+.card.expanded .card-desc{display:none;}
+
+.tab-row{display:flex;gap:4px;margin-bottom:8px;}
+.tab-btn{font-family:'DM Mono',monospace;font-size:10px;padding:4px 10px;border-radius:4px;border:1px solid var(--border);background:none;color:var(--text3);cursor:pointer;transition:all .15s;}
+.tab-btn.active{background:var(--bg);border-color:var(--accent);color:var(--accent);}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
+
+.prompt-pre{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);line-height:1.8;background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:12px 13px;white-space:pre-wrap;word-break:break-word;}
+.example-pre{font-family:'DM Mono',monospace;font-size:11px;color:#6a9e70;line-height:1.8;background:#0c140d;border:1px solid rgba(126,201,138,0.15);border-radius:6px;padding:12px 13px;white-space:pre-wrap;word-break:break-word;}
+.example-label{font-family:'DM Mono',monospace;font-size:9.5px;color:var(--accent);margin-bottom:6px;display:block;}
+.how-box{background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:12px 13px;}
+.how-step{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;}
+.how-step:last-child{margin-bottom:0;}
+.how-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);background:rgba(126,201,138,0.1);border-radius:4px;padding:2px 7px;flex-shrink:0;margin-top:1px;}
+.how-text{font-size:12px;color:var(--text2);line-height:1.6;}
+.how-text strong{color:var(--text);font-weight:600;}
+
+.card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
+.lvl{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);display:flex;align-items:center;gap:4px;}
+.dot{width:5px;height:5px;border-radius:50%;display:inline-block;}
+.d-b{background:var(--t-train-c);}
+.d-m{background:var(--t-fund-c);}
+.d-a{background:var(--t-mkt-c);}
+
+.no-res{text-align:center;padding:56px 20px;color:var(--text3);font-family:'DM Mono',monospace;font-size:13px;display:none;}
+
+@media(max-width:768px){
+  .header,.qs-banner,.finder,.priv-bar{padding-left:20px;padding-right:20px;}
+  .qs-banner,.finder{margin:0 0;}
+  .priv-bar{margin:0;}
+  .main{flex-direction:column;}
+  .sidebar{width:100%;position:static;border-right:none;border-bottom:1px solid var(--border);}
+  .content{padding:16px 14px;}
+  .cards-grid{grid-template-columns:1fr;}
+  .qs-steps{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="hl">// Промпт библиотека · Образователно НПО · v5.0 · 4D Framework</div>
+  <h1>Анализирай данните си<br>с <em>LLMs</em> — бързо и точно</h1>
+  <p>Готови промптове за обучение, фондонабиране, маркетинг и подбор. С примерни данни, стъпка по стъпка обяснения и намерител за правилния промпт.</p>
+  <div class="meta-row">
+    <div class="mpill">📦 <b id="tc">0</b> промпта</div>
+    <div class="mpill">🎯 <b>4 екипа + смесен анализ</b></div>
+    <div class="mpill">🇧🇬 <b>Само за български данни</b></div>
+  </div>
+</div>
+
+<!-- QUICK START -->
+<div class="qs-banner">
+  <div class="qs-title">Бързо начало — за нови потребители</div>
+  <div class="qs-steps">
+    <div class="qs-step">
+      <div class="qs-step-num">01</div>
+      <div class="qs-step-title">Намери промпт</div>
+      <div class="qs-step-desc">Използвай намерителя по-долу или филтрирай по екип в менюто вляво.</div>
+    </div>
+    <div class="qs-step">
+      <div class="qs-step-num">02</div>
+      <div class="qs-step-title">Копирай промпта</div>
+      <div class="qs-step-desc">Натисни „Копирай" и отвори <strong>claude.ai</strong> или ChatGPT в нов прозорец.</div>
+    </div>
+    <div class="qs-step">
+      <div class="qs-step-num">03</div>
+      <div class="qs-step-title">Анонимизирай данните</div>
+      <div class="qs-step-desc">Замени имена с [ИМЕ] и изтрий лични данни преди да поставиш.</div>
+    </div>
+    <div class="qs-step">
+      <div class="qs-step-num">04</div>
+      <div class="qs-step-title">Постави данните</div>
+      <div class="qs-step-desc">Замени [ПОСТАВИ ДАННИТЕ] с твоите отговори или коментари.</div>
+    </div>
+    <div class="qs-step">
+      <div class="qs-step-num">05</div>
+      <div class="qs-step-title">Изпрати и итерирай</div>
+      <div class="qs-step-desc">Ако резултатът не е точен — кажи на LLM какво да промени и опитай отново.</div>
+    </div>
+  </div>
+</div>
+
+<!-- 4D FRAMEWORK INTRO -->
+<div class="d4-intro">
+  <div class="d4-intro-title">4D Framework — четири компетенции за работа с AI</div>
+  <div class="d4-cards">
+    <div class="d4-card desc">
+      <div class="d4-card-icon">📝</div>
+      <div class="d4-card-title">Description</div>
+      <div class="d4-card-desc">Опиши задачата точно — контекст, данни, цел, аудитория. Качеството на изхода зависи пряко от качеството на описанието.</div>
+      <div class="d4-card-example">"Данните са от 47 учители след 3-дневно обучение. Аудитория: донори."</div>
+    </div>
+    <div class="d4-card deleg">
+      <div class="d4-card-icon">🤝</div>
+      <div class="d4-card-title">Delegation</div>
+      <div class="d4-card-desc">Знай кое да дадеш на AI — повтарящи се задачи, кодиране, синтез на много текстове. Запази за себе си финалните решения.</div>
+      <div class="d4-card-example">"Claude кодира 200 отговора, аз вземам решението за подбора."</div>
+    </div>
+    <div class="d4-card disc">
+      <div class="d4-card-icon">🔍</div>
+      <div class="d4-card-title">Discernment</div>
+      <div class="d4-card-desc">Прецени критично изхода — темите реалистични ли са? Цитатите представителни ли са? Анонимизацията пълна ли е?</div>
+      <div class="d4-card-example">"Тази тема изглежда надценена — само 2 от 47 я споменават."</div>
+    </div>
+    <div class="d4-card dil">
+      <div class="d4-card-icon">⚡</div>
+      <div class="d4-card-title">Diligence</div>
+      <div class="d4-card-desc">Итерирай — ако резултатът не е точен, кажи на AI какво да промени. Запази промптите за следващия цикъл.</div>
+      <div class="d4-card-example">"Бъди по-конкретен — използвай само примери от данните, без общи твърдения."</div>
+    </div>
+  </div>
+</div>
+
+<!-- FINDER -->
+<div class="finder">
+  <div class="finder-title">Намерител — кой промпт ти трябва?</div>
+  <div class="finder-row">
+    <div style="flex:1;min-width:200px;">
+      <div class="finder-q">Какви данни имаш?</div>
+      <div class="finder-btns" id="f-data">
+        <button class="finder-btn" data-val="survey">Анкета с отворени въпроси</button>
+        <button class="finder-btn" data-val="scores">Оценки + коментари</button>
+        <button class="finder-btn" data-val="interview">Интервюта / транскрипти</button>
+        <button class="finder-btn" data-val="campaign">Коментари от кампания</button>
+        <button class="finder-btn" data-val="numbers">Само числа (NPS, %, брой)</button>
+      </div>
+    </div>
+    <div style="flex:1;min-width:200px;">
+      <div class="finder-q">Какво искаш да разбереш?</div>
+      <div class="finder-btns" id="f-goal">
+        <button class="finder-btn" data-val="themes">Кои са основните теми</button>
+        <button class="finder-btn" data-val="why">Защо оценките са такива</button>
+        <button class="finder-btn" data-val="compare">Сравнение между групи/периоди</button>
+        <button class="finder-btn" data-val="report">Доклад за донори/борд</button>
+        <button class="finder-btn" data-val="recruit">Анализ на кандидати</button>
+      </div>
+    </div>
+  </div>
+  <div class="finder-result" id="finder-result">
+    <div class="finder-result-label">Препоръчани промптове</div>
+    <div class="finder-cards" id="finder-cards"></div>
+  </div>
+</div>
+
+<!-- PRIVACY BAR -->
+<div class="priv-bar">
+  🔒 <strong>Поверителност:</strong> Преди да поставяш данни в Claude или ChatGPT — замени имена, ЕГН и контакти с [ИМЕ] / [КОНТАКТ]. Не поставяй чувствителна финансова или медицинска информация.
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <aside class="sidebar">
+    <div class="sb-title">Функция</div>
+    <button class="fb active" data-f="all">Всички <span class="fc" id="ca">0</span></button>
+    <button class="fb" data-f="train"><span class="dot-s" style="background:var(--t-train-c)"></span>Обучение & менторство <span class="fc" id="ctr">0</span></button>
+    <button class="fb" data-f="alumni"><span class="dot-s" style="background:var(--t-alumni-c)"></span>Alumni <span class="fc" id="cal">0</span></button>
+    <button class="fb" data-f="rec"><span class="dot-s" style="background:var(--t-rec-c)"></span>Подбор <span class="fc" id="cre">0</span></button>
+    <button class="fb" data-f="fund"><span class="dot-s" style="background:var(--t-fund-c)"></span>Фондонабиране <span class="fc" id="cfu">0</span></button>
+    <button class="fb" data-f="mkt"><span class="dot-s" style="background:var(--t-mkt-c)"></span>Маркетинг & комуникации <span class="fc" id="cmk">0</span></button>
+    <button class="fb" data-f="part"><span class="dot-s" style="background:var(--t-part-c)"></span>Партньорства <span class="fc" id="cpa">0</span></button>
+    <button class="fb" data-f="events"><span class="dot-s" style="background:var(--t-events-c)"></span>Събития <span class="fc" id="cev">0</span></button>
+    <button class="fb" data-f="content"><span class="dot-s" style="background:var(--t-content-c)"></span>Материали за учители <span class="fc" id="cco">0</span></button>
+    <button class="fb" data-f="projects"><span class="dot-s" style="background:var(--t-projects-c)"></span>Проекти & отчетност <span class="fc" id="cpr">0</span></button>
+    <button class="fb" data-f="mixed"><span class="dot-s" style="background:var(--t-mixed-c)"></span>Смесен анализ <span class="fc" id="cmx">0</span></button>
+    <div class="sb-sep"></div>
+    <div class="sb-title">Изход</div>
+    <button class="fb" data-f="text">📝 Текстов доклад</button>
+    <button class="fb" data-f="table">📊 Таблица / Excel</button>
+    <button class="fb" data-f="json">⚙️ JSON</button>
+    <div class="sb-sep"></div>
+    <div class="sb-title">Ниво</div>
+    <button class="fb" data-f="basic">🟢 Базов</button>
+    <button class="fb" data-f="medium">🟡 Среден</button>
+    <button class="fb" data-f="advanced">🔴 Напреднал</button>
+  </aside>
+
+  <div class="content">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input class="search-bar" id="search" type="text" placeholder="Търси… (учители, NPS, донори, кампания, тенденции…)">
+    </div>
+    <div id="cc"></div>
+    <div class="no-res" id="nr">Няма намерени промптове. Опитай с друг термин.</div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────
+const P = [
+  // ══ ОБУЧЕНИЕ & МЕНТОРСТВО ══
+  {id:1,cat:'train',level:'basic',out:'text',tags:['survey'],privacy:false,
+   d4:['description','delegation','discernment'],
+   d4how:{
+     description:'Опиши контекста: кой е попълнил анкетата, колко отговора имаш, след какъв вид обучение са. Колкото по-конкретен си, толкова по-точен е анализът.',
+     delegation:'Постави отговорите и изпрати. Claude ще извлече темите, ще преброи честотите и ще избере цитати — работа, която ръчно отнема 2–3 часа.',
+     discernment:'Провери: Темите реалистични ли са? Цитатите представителни ли са за цялата група или само за крайните случаи? Ако нещо изглежда грешно — итерирай.',
+   },
+   title:'Обратна връзка след обучение',
+   desc:'Открива силните страни и областите за подобрение в програма за учители.',
+   prompt:`Анализирай следните отговори от анкета след обучение с учители.
+
+Въпроси, на които са отговаряли:
+- Какво беше най-полезното от обучението?
+- Какво бихте искали да е по-различно?
+- Какво ще приложите в класната стая?
+
+Задача:
+1. СИЛНИ СТРАНИ — топ 3 неща, оценени най-позитивно
+2. ОБЛАСТИ ЗА ПОДОБРЕНИЕ — топ 3 повтарящи се препоръки
+3. НАМЕРЕНИЯ ЗА ПРИЛАГАНЕ — какви конкретни практики планират учителите?
+4. ИЗНЕНАДВАЩИ ИНСАЙТИ — неочаквани коментари, заслужаващи внимание
+5. ПРЕПОРЪКА — едно конкретно подобрение за следващата сесия
+
+Отговори:
+[ПОСТАВИ ОТГОВОРИТЕ ТУК]`,
+   example:`Въпрос: "Какво беше най-полезното от обучението?"
+
+Отговор 1: "Практическите примери с реални ситуации от класната стая. Наистина видях как да приложа техниките."
+Отговор 2: "Работата в малки групи — можахме да обменяме опит с колеги от други училища."
+Отговор 3: "Модулът за диференцирано обучение беше точно това, от което имах нужда. Имам ученик с дислексия и не знаех как да подходя."
+Отговор 4: "Честно казано очаквах повече теория, а се оказа много практически насочено. Приятна изненада."
+Отговор 5: "Фасилитаторът беше много добър — даваше ни достатъчно пространство да говорим, но и насочваше когато се отклонявахме."`,
+   how:`Стъпка 1: Копирай промпта.
+Стъпка 2: Отиди на claude.ai и постави промпта.
+Стъпка 3: Замени [ПОСТАВИ ОТГОВОРИТЕ ТУК] с реалните отговори от твоята анкета (всеки на нов ред).
+Стъпка 4: Изпрати. Claude ще върне структуриран анализ за ~30 секунди.
+💡 Съвет: Ако имаш повече от 50 отговора, подавай ги на групи от 20–25.`
+  },
+  {id:2,cat:'train',level:'medium',out:'text',tags:['survey'],privacy:false,
+   d4:['description','delegation','discernment','diligence'],
+   d4how:{
+     description:'Уточни периодите ясно: "baseline = септември 2023", "среда = януари 2024". Контекстът помага на Claude да тълкува промените правилно.',
+     delegation:'Подай данните от трите точки и остави Claude да идентифицира промените в езика и нагласите — това е трудно да се направи ръчно с много участници.',
+     discernment:'Промените реални ли са или само привидни? Може ли нещо друго (не програмата) да обяснява разликата? Задай тези въпроси на Claude ако не са адресирани.',
+     diligence:'Запази анализа и го ползвай като основа за следващата година. Така ще можеш да сравняваш тенденциите между различни кохорти.',
+   },
+   title:'Прогрес на учителите — три точки',
+   desc:'Проследява как са се развили участниците от началото до края на програмата.',
+   prompt:`Имам отговори от три точки на анкетиране на един и същ учител/група:
+- Начало на програмата (baseline)
+- Средата на програмата
+- Края на програмата
+
+Анализирай:
+1. ПРОМЯНА В НАГЛАСИТЕ — как са се развили убежденията по ключови теми?
+2. ПРИДОБИТИ КОМПЕТЕНЦИИ — кои умения са укрепнали най-много?
+3. УСТОЙЧИВИ ПРЕДИЗВИКАТЕЛСТВА — кое остава трудно въпреки програмата?
+4. ПРОМЕНИ В ЕЗИКА — промени ли се начинът на изразяване?
+5. ПРЕПОРЪКИ — какво да засилим в следващата итерация?
+
+Baseline данни: [ПОСТАВИ]
+Среда: [ПОСТАВИ]
+Край: [ПОСТАВИ]`,
+   example:`Baseline (септември):
+"Не знам дали мога да достигна до всеки ученик — някои просто не искат да учат."
+
+Среда (януари):
+"Опитвам се да разбирам защо един ученик не участва, преди да правя изводи. Не винаги успявам, но го правя по-съзнателно."
+
+Край (юни):
+"Промених начина си на водене на часа. Вече давам повече избор на учениците и виждам разлика в ангажираността. Дори 'трудните' ученици се включват понякога."`,
+   how:`Стъпка 1: Нужни са ти отговори от едни и същи участници от 3 момента.
+Стъпка 2: Групирай отговорите по участник или по въпрос.
+Стъпка 3: Копирай промпта и попълни трите секции с данните.
+💡 Съвет: Ако нямаш данни за всички три точки, можеш да ползваш само baseline + край.`
+  },
+  {id:3,cat:'train',level:'medium',out:'text',tags:['interview'],privacy:false,
+   d4:['description', 'delegation', 'discernment'],
+   d4how:{
+     'description': 'Добави контекст за менторите: вътрешни или външни са, колко опит имат. Влияе на тълкуването.',
+     'delegation': 'Claude ще идентифицира модели в менторските разговори, ще сегментира по опит на учителите и ще открие системни пропуски — без ти да четеш всеки отговор.',
+     'discernment': 'Менторите ще прочетат ли анализа? Ако да — провери дали изводите са достатъчно конструктивни, преди да споделяш.',
+   },
+   title:'Оценка на ментор-сесии',
+   desc:'Анализира качеството на менторските разговори от гледна точка на учителя.',
+   prompt:`Анализирай следните отговори от учители за техните ментор-сесии.
+
+Контекст: Учителите имат редовни срещи с ментори като част от програмата.
+
+Извлечи:
+1. ЕФЕКТИВНИ ПРАКТИКИ — какви подходи на менторите са помогнали най-много?
+2. ПРОПУСКИ — какво липсва от менторството?
+3. ТЕМИ НА РАЗГОВОРИТЕ — за какво говорят учителите с менторите?
+4. ЕМОЦИОНАЛЕН КЛИМАТ — как се чувстват учителите в тези разговори?
+5. РАЗЛИКИ ПО ОПИТ — има ли разлика между начинаещи и опитни учители?
+
+Отговори:
+[ПОСТАВИ ОТГОВОРИТЕ]`,
+   example:`Учител 1 (3 години опит): "Менторът ми задава въпроси, вместо да ми дава готови отговори. Отначало ме дразнеше, сега разбирам защо — принуждава ме сам да мисля."
+Учител 2 (15 години опит): "Полезно е да говоря с някой извън моето училище. Вижда нещата от друг ъгъл."
+Учител 3 (1 година опит): "Понякога не знам какво да питам. Срещата минава, но се чувствам че не съм използвал времето добре."
+Учител 4 (7 години опит): "Менторът ми помогна да се справя с конфликт с родители. Нямаше как да го науча другаде."`,
+   how:`Стъпка 1: Събери отговорите от анкетата след ментор-сесии.
+Стъпка 2: Ако имаш информация за опита на учителя — добави я към всеки отговор.
+Стъпка 3: Постави в промпта и изпрати.
+💡 Съвет: Добави контекст: "Менторите са външни специалисти / колеги / alumni" — влияе на анализа.`
+  },
+  {id:4,cat:'train',level:'advanced',out:'text',tags:['survey','interview'],privacy:false,
+   d4:['description', 'delegation', 'discernment', 'diligence'],
+   d4how:{
+     'description': 'Уточни аудиторията ПРЕДИ да подадеш данните: "Пиши за донори без специализирани познания" vs. "Пиши за екипа". Тонът ще е коренно различен.',
+     'delegation': 'Най-трудоемката работа — синтез на данни от много източници в нарратив — е точно това, в което LLMs са силни. Делегирай структурата и черновата изцяло.',
+     'discernment': 'Проверки: Историите анонимни ли са? Числата точни ли са? Критиките честни, но не разрушителни?',
+     'diligence': 'Запази шаблона на доклада. Следващата година ще попълниш само данните — структурата остава.',
+   },
+   title:'Пълен impact доклад за програмата',
+   desc:'Генерира структуриран доклад за въздействие — подходящ за донори и борд.',
+   prompt:`Действай като изследовател на образователно въздействие. Анализирай данните от нашата програма за обучение на учители.
+
+Контекст: Работим с учители от [вид училище]. Програмата включва [опиши накратко].
+
+СТРУКТУРА НА ДОКЛАДА:
+1. РЕЗЮМЕ НА ВЪЗДЕЙСТВИЕТО (за донори — ясен, неспециализиран език)
+2. ПРОМЕНИ В ПРАКТИКАТА — конкретни примери за прилагане в класната стая
+3. ПРОМЕНИ В НАГЛАСИТЕ — към ученици, методология, собствено развитие
+4. ИСТОРИИ ОТ ДАННИТЕ — 3 представителни "гласа" (анонимни)
+5. КАКВО НЕ ПРОРАБОТИ — честен анализ на ограниченията
+6. ПРЕПОРЪКИ — за следващия цикъл на програмата
+
+Данни:
+[ПОСТАВИ ДАННИТЕ]
+
+Аудитория на доклада: [донори / управителен съвет / екип]`,
+   example:`(Можеш да комбинираш данни от анкети и интервюта)
+
+Примерни данни за поставяне:
+"Учителите споменават промяна в подхода към оценяването — повече формативно, по-малко тест-ориентирано."
+"Трима учители са споделили, че са въвели нови практики директно след обучението."
+"Предизвикателство: учителите от малките градове имат по-малко подкрепа от директорите."`,
+   how:`Стъпка 1: Събери данните от анкети + интервюта в един документ.
+Стъпка 2: Можеш да подадеш суровите отговори ИЛИ обобщени бележки.
+Стъпка 3: Уточни аудиторията (донори vs. вътрешен екип) — тонът ще се различава.
+💡 Съвет: Генерирай две версии — една за донори (по-кратка, с цитати) и една за екипа (по-детайлна, с препоръки).`
+  },
+
+  // ══ ALUMNI ══
+  {id:5,cat:'alumni',level:'basic',out:'text',tags:['survey'],privacy:false,
+   d4:['description', 'delegation', 'discernment'],
+   d4how:{
+     'description': 'Добави кога са завършили alumni — преди 1, 2 или 5 години. Дълготрайността на въздействието е различна и Claude ще я анализира по-прецизно.',
+     'delegation': 'Claude ще извлече представителни цитати, подходящи за публично споделяне — работа, която иначе отнема дни на ръчно четене.',
+     'discernment': 'Цитатите за публична употреба — проверени ли са за анонимност? Представителни ли са за цялата група, а не само за най-доволните?',
+   },
+   title:'Анализ на alumni анкета',
+   desc:'Открива какво носят alumni от програмата в дългосрочен план.',
+   prompt:`Анализирай отговорите от нашата alumni анкета.
+
+Контекст: Alumni са бивши участници в нашата програма за учители, завършили преди [период].
+
+Задача:
+1. ДЪЛГОТРАЙНО ВЪЗДЕЙСТВИЕ — кои елементи на програмата са оцелели?
+2. КАРИЕРНИ ТРАЕКТОРИИ — как alumni са се развили след програмата?
+3. ПРЕПОРЪЧАНИ ПОСЛАНИЯ — какви думи използват, когато говорят за нас?
+4. КРИТИЧНИ ГЛЕДНИ ТОЧКИ — какво е изчезнало или не е помогнало?
+5. ЦИТАТИ ЗА КОМУНИКАЦИЯ — 3–5 автентични изречения (анонимни)
+
+Отговори:
+[ПОСТАВИ ОТГОВОРИТЕ]`,
+   example:`Alumni 1 (завършил преди 3 г.): "Все още ползвам техниките за обратна връзка, които научих. Дори обучавам колеги в тях."
+Alumni 2 (завършил преди 2 г.): "Програмата ме накара да остана в образованието. Бях на ръба да се откажа."
+Alumni 3 (завършил преди 1 г.): "Полезна беше мрежата от хора — до ден днешен се чуваме с колеги от програмата."
+Alumni 4 (завършил преди 4 г.): "Честно казано, от конкретните техники малко е останало. Но нагласата — да гледам на преподаването като занаят, който се усъвършенства — тя остана."`,
+   how:`Стъпка 1: Подготви данните от alumni анкетата.
+Стъпка 2: Ако имаш информация кога са завършили — добави я (помага за анализа на дълготрайност).
+Стъпка 3: Постави и изпрати.
+💡 Съвет: Поискай от Claude да отдели цитатите, подходящи за публично споделяне — ще спестиш работа.`
+  },
+  {id:6,cat:'alumni',level:'medium',out:'text',tags:['survey'],privacy:false,
+   d4:['description', 'delegation', 'discernment', 'diligence'],
+   d4how:{
+     'description': 'Добави поведенчески данни ако имаш: отваряния на имейли, посещения на сайта, участие в събития. Обогатява сегментирането значително.',
+     'delegation': 'Сегментирането на стотици alumni ръчно е невъзможно. Claude може да направи това за минути и да предложи стратегия за всяка група.',
+     'discernment': 'Сегментите имат ли смисъл? Дали "разочарованите" са наистина разочаровани или просто не са получавали комуникация?',
+     'diligence': 'Актуализирай сегментирането всяка година. Промените между годините показват дали стратегията ти за alumni работи.',
+   },
+   title:'Сегментиране на alumni по ангажираност',
+   desc:'Открива профили — от пасивни alumni до активни амбасадори на организацията.',
+   prompt:`Анализирай следните отговори от alumni и ги сегментирай по ниво на ангажираност.
+
+Търси профили:
+- АМБАСАДОРИ — активно препоръчват, участват, доброволстват
+- ПОДДРЪЖНИЦИ — позитивни, следят, но не са активни
+- ТИХИ — завършили, без особена връзка
+- РАЗОЧАРОВАНИ — имат неизпълнени очаквания
+
+За всеки сегмент:
+1. Характеристики и приблизителен дял
+2. Какво ги мотивира (или спира)?
+3. Как да ги ангажираме по-добре?
+
+Данни:
+[ПОСТАВИ ОТГОВОРИТЕ]`,
+   example:`"Препоръчал съм програмата на 4 колеги тази година. Радвам се когато могат да се включат." → Амбасадор
+"Следя новините ви в социалните медии, но не съм намирал причина да се включа отново активно." → Поддръжник
+"Честно казано рядко мисля за програмата. Беше полезна, но животът върви напред." → Тих
+"Очаквах повече подкрепа след приключване на програмата. Усещам, че сме изоставени след края." → Разочарован`,
+   how:`Стъпка 1: Събери отговорите от alumni анкетата или имейли.
+Стъпка 2: Не е нужно предварително да ги класифицираш — Claude ще направи това.
+Стъпка 3: Ако имаш и поведенчески данни (отвори имейли, посещения на сайта), добави ги.
+💡 Съвет: Резултатите от сегментирането могат директно да информират стратегия за alumni комуникация.`
+  },
+
+  // ══ ФОНДОНАБИРАНЕ ══
+  {id:7,cat:'fund',level:'basic',out:'text',tags:['survey'],privacy:false,
+   d4:['description', 'delegation', 'discernment'],
+   d4how:{
+     'description': 'Уточни типа данни: имейл кореспонденция, анкета след среща, фокус група. Различните формати дават различни видове изводи.',
+     'delegation': 'Claude ще открие повтарящи се послания и тревоги, без ти да четеш всяка комуникация. Особено ценно при много донори.',
+     'discernment': 'Изводите за "тревоги на донорите" — споделяш ли ги само с екипа или с донорите? Адаптирай тона според употребата.',
+   },
+   title:'Анализ на донорски feedback',
+   desc:'Разбира мотивацията, очакванията и тревогите на донорите.',
+   prompt:`Анализирай следните коментари, анкети или имейли от донори.
+
+Контекст: Ние сме образователно НПО, работещо с учители.
+
+1. МОТИВАЦИЯ ЗА ДАРЯВАНЕ — защо подкрепят нашата кауза?
+2. ОЧАКВАНИЯ — какво искат да видят в резултат?
+3. КОМУНИКАЦИОННИ ПРЕДПОЧИТАНИЯ — как искат да бъдат информирани?
+4. ТРЕВОГИ И СЪМНЕНИЯ — какво ги притеснява?
+5. ПОСЛАНИЯ С РЕЗОНАНС — кои наши думи цитират или повтарят?
+
+Данни:
+[ПОСТАВИ ДАННИТЕ]`,
+   example:`Донор 1: "Подкрепям ви защото вярвам, че учителят е ключът. Ако подобрим качеството на преподаване, всичко останало следва."
+Донор 2: "Искам да виждам конкретни числа — колко учители, какъв процент са останали в образованието."
+Донор 3: "Чудя се дали програмата достига до учителите, които наистина имат нужда, или само до вече мотивираните."
+Донор 4: "Комуникацията ви е много добра. Харесвам историите — не само графиките."`,
+   how:`Стъпка 1: Събери имейли, бележки от разговори или отговори от донорски анкети.
+Стъпка 2: Анонимизирай имената на донорите.
+Стъпка 3: Постави и изпрати.
+💡 Съвет: Резултатите директно информират следващия донорски бюлетин или грантово приложение.`
+  },
+  {id:8,cat:'fund',level:'advanced',out:'text',tags:['survey','interview'],privacy:false,
+   d4:['description', 'delegation', 'diligence'],
+   d4how:{
+     'description': 'Уточни целевия донор: корпоративен (иска ROI и числа), фондация (иска теория на промяната), индивидуален (иска истории). Тонът е коренно различен.',
+     'delegation': 'Трансформацията от сурови данни в наратив е точно работата за LLM. Делегирай структурата и изборът на цитати изцяло.',
+     'diligence': 'Запази case for support документа. Актуализирай само числата и историите всяка година — структурата остава непроменена.',
+   },
+   title:'Case for support от полеви данни',
+   desc:'Трансформира данни от анкети и интервюта в убедителен донорски наратив.',
+   prompt:`Действай като fundraising copywriter за образователно НПО.
+
+Имам сурови данни от анкети с учители, alumni интервюта и бележки от теренни посещения.
+
+Задача: Извлечи най-убедителните елементи и изгради "case for support".
+
+Структура:
+1. ХУМАНИЗИРАЩА ИСТОРИЯ — реален (анонимен) случай от данните
+2. ДОКАЗАТЕЛСТВО ЗА НУЖДА — какво показват данните за проблема?
+3. ДОКАЗАТЕЛСТВО ЗА ВЪЗДЕЙСТВИЕ — какво се е променило заради нас?
+4. НЕОТЛОЖНОСТ — защо сега?
+5. ПОКАНА ЗА ДЕЙСТВИЕ — как може донорът да допринесе?
+
+Данни:
+[ПОСТАВИ ДАННИТЕ]
+
+Целева аудитория: [корпоративни донори / фондации / индивидуални дарители]`,
+   example:`Данни за поставяне:
+"Учителка от малко село споделя: 'Нямах с кого да говоря за трудностите в класната стая. Програмата ми даде и знания, и общност.'"
+"78% от участниците са приложили нова практика в рамките на месец след обучението."
+"В България 40% от учителите напускат в първите 5 години. Нашите данни показват, че alumni задържане е с 23% по-високо."`,
+   how:`Стъпка 1: Събери данните — не е нужно да са структурирани. Могат да са бележки, цитати, числа.
+Стъпка 2: Уточни кому е предназначен документът — тонът е различен за фондации vs. корпоративни донори.
+Стъпка 3: Прегледай и адаптирай — Claude ще ти даде добра основа, но ти познаваш организацията най-добре.`
+  },
+  {id:9,cat:'fund',level:'medium',out:'text',tags:['survey'],privacy:false,
+   d4:['description', 'discernment', 'diligence'],
+   d4how:{
+     'description': 'Предостави пълния текст на feedback-а от донора, не само резюме. Нюансите в езика са важни за тълкуването.',
+     'discernment': 'Изводите са интерпретация — може ли feedback-ът да означава нещо различно? Ако не си сигурен, добав въпрос директно към донора.',
+     'diligence': 'Запази всички гранови feedback-и в един документ. С времето ще видиш модели в това, което различните донори ценят.',
+   },
+   title:'Анализ на грантов feedback',
+   desc:'Извлича инсайти от обратна връзка след одобрено или отхвърлено грантово приложение.',
+   prompt:`Анализирай следния feedback от донорска организация по нашето грантово приложение.
+
+Тип: [одобрено с коментари / отхвърлено / запитване за допълнителна информация]
+
+1. КЛЮЧОВИ ПРИТЕСНЕНИЯ — какво не е убедило донора?
+2. СИЛНИ СТРАНИ — какво е оценено позитивно?
+3. ПРОПУСКИ В НАРАТИВА — какво липсва в нашата история?
+4. ПРЕПОРЪКИ — конкретни промени за следващото приложение
+5. СТРАТЕГИЧЕСКИ ВЪПРОСИ — подходяща ли е тази програма за нас?
+
+Feedback:
+[ПОСТАВИ FEEDBACK]
+
+Нашето приложение (резюме):
+[ОПИШИ НАКРАТКО]`,
+   example:`Feedback от донор:
+"Оценяваме ясната теория на промяна, но бихме искали повече данни за дългосрочното въздействие след края на програмата. Как проследявате учителите след 1–2 години?"
+
+Резюме на приложението:
+"Програма за обучение на 50 учители от малки общини, включваща 3 модула и 6 ментор-сесии."`,
+   how:`Стъпка 1: Копирай цялата комуникация с донора.
+Стъпка 2: Добави кратко описание на приложението за контекст.
+Стъпка 3: Изпрати — Claude ще раздели конструктивно критиките от похвалите и ще предложи конкретни промени.`
+  },
+
+  // ══ МАРКЕТИНГ & КАМПАНИИ ══
+  {id:10,cat:'mkt',level:'basic',out:'text',tags:['campaign'],privacy:false,
+   d4:['description', 'delegation', 'discernment'],
+   d4how:{
+     'description': 'Добави контекст: кога е пуснат постът, какво е изображението/съобщението, колко обхват е имал. Влияе значително на тълкуването на реакциите.',
+     'delegation': 'Claude ще категоризира стотици коментари за минути и ще открие PR рискове, които лесно се пропускат при ръчно четене.',
+     'discernment': 'Негативните коментари — изолирани случаи или системен проблем? Не всяка критика изисква действие.',
+   },
+   title:'Анализ на реакции към кампания',
+   desc:'Разбира как аудиторията реагира на маркетингово съдържание.',
+   prompt:`Анализирай коментарите и реакциите към нашата кампания [НАЗВАНИЕ].
+
+Насочена към: [учители / родители / широка публика / донори]
+Канали: [Facebook / Instagram / имейл / друго]
+
+1. РЕЗОНАНС — кои послания са предизвикали най-силна реакция (позитивна)?
+2. СЪПРОТИВА — има ли критики или недоразумения?
+3. ВЪПРОСИ — какво хората не разбират или искат да знаят повече?
+4. НЕОЧАКВАНИ АУДИТОРИИ — кой е реагирал извън целевата група?
+5. ПРЕПОРЪКИ — как да оптимизираме следващата кампания?
+
+Коментари/реакции:
+[ПОСТАВИ ДАННИТЕ]`,
+   example:`"Точно това липсваше! Споделям с всички колеги." — учителка, 34 г.
+"Звучи интересно, но как да кандидатствам ако съм от малко село?"
+"Страхотна инициатива! Защо никой не е правил това досега?"
+"Е хубаво, ама учителите нямат нужда от обучение, а от по-добри заплати 🙄"
+"Моята дъщеря е учителка — ще й пратя линка."`,
+   how:`Стъпка 1: Копирай коментарите от социалните мрежи или имейл отговорите.
+Стъпка 2: Добави контекст: кой е постът, кога е публикуван, колко обхват е имал.
+Стъпка 3: Постави в промпта — полезно е да включиш и негативните коментари.
+💡 Съвет: Ако имаш данни от няколко поста, анализирай ги заедно за по-богати инсайти.`
+  },
+  {id:11,cat:'mkt',level:'medium',out:'text',tags:['survey','campaign'],privacy:false,
+   d4:['description', 'delegation', 'discernment', 'diligence'],
+   d4how:{
+     'description': 'Добави числа: от кой канал са дошли колко кандидати. Комбинацията от числа и коментари дава пълната картина.',
+     'delegation': 'Claude ще открие кои послания резонират и кои бариери спират кандидатите — анализ, трудно постижим без четене на всеки отговор.',
+     'discernment': 'Каналът с най-много кандидати не е задължително най-ефективен — важно е качеството. Провери дали Claude е адресирал и качеството, не само количеството.',
+     'diligence': 'Повтаряй анализа всяка кампания. Тенденциите между годините показват дали инвестицията в различни канали се отплаща.',
+   },
+   title:'Канали и послания за набиране на учители',
+   desc:'Разбира кои канали и послания привличат кандидати за програмата.',
+   prompt:`Анализирай отговорите на кандидатите на въпроса "Откъде научихте за нас?" и коментарите им при кандидатстване.
+
+1. КАНАЛИ НА ДОСТИГАНЕ — кои канали работят най-добре?
+2. ПРИВЛИЧАЩИ ПОСЛАНИЯ — какво ги е накарало да кандидатстват?
+3. БАРИЕРИ — какво почти ги е спряло?
+4. ПРЕПОРЪКИ ОТ УСТА НА УСТА — колко са дошли по препоръка?
+5. ОПТИМИЗАЦИИ — кой канал да усилим?
+
+Данни:
+[ПОСТАВИ ОТГОВОРИТЕ]`,
+   example:`Кандидат 1: "Чух от колежка, която участва миналата година. Тя ми разказа толкова добри неща, че реших веднага."
+Кандидат 2: "Видях пост в група за учители във Facebook. Препоръчах на още 2 приятеля."
+Кандидат 3: "Намерих ви в Google, когато търсих обучения за учители. Сайтът ми хареса."
+Кандидат 4: "Директорът ми сподели информацията. Иначе нямаше да разбера."`,
+   how:`Стъпка 1: Събери отговорите от кандидатурната форма или уводната анкета.
+Стъпка 2: Постави в промпта — дори 10–15 отговора дават добри инсайти.
+💡 Съвет: Комбинирай с данни колко кандидата са дошли от всеки канал за по-пълна картина.`
+  },
+  {id:12,cat:'mkt',level:'medium',out:'text',tags:['survey'],privacy:false,
+   d4:['description', 'delegation', 'discernment'],
+   d4how:{
+     'description': 'Добави тип потребители: учители от кои предмети/нива. Нуждите са много различни и Claude ще открие по-специфични сегменти.',
+     'delegation': 'Анализът на стотици отзива за UX проблеми е класическа задача за LLMs. Делегирай категоризацията и приоритизирането изцяло.',
+     'discernment': 'Приоритетите за подобрение — технически изпълними ли са? Провери с разработчик преди да ги включиш в план.',
+   },
+   title:'Обратна връзка за онлайн платформата',
+   desc:'Открива какво работи и какво липсва в платформата с ресурси за учители.',
+   prompt:`Анализирай отзивите от потребители на нашата онлайн платформа с ресурси.
+
+1. РЕСУРСИ СЪС СТОЙНОСТ — кои материали се споменават позитивно?
+2. НАВИГАЦИОННИ ПРОБЛЕМИ — трудно ли е да се намери нещо?
+3. ЛИПСВАЩО СЪДЪРЖАНИЕ — какво търсят, но не намират?
+4. ТЕХНИЧЕСКИ ПРОБЛЕМИ — повтарящи се оплаквания
+5. СЦЕНАРИИ НА УПОТРЕБА — кога и как ползват платформата?
+6. ПРИОРИТЕТИ — топ 3 подобрения
+
+Отзиви:
+[ПОСТАВИ ОТЗИВИТЕ]`,
+   example:`"Платформата е добра, но трудно намирам ресурсите по тема. Трябва ми по-добро търсене."
+"Свалих почти всичко от секцията за диференцирано обучение — огромна помощ!"
+"Нямате ли нещо специално за начинаещи учители? Всичко изглежда за хора с опит."
+"Ползвам платформата в неделя вечер, за да се подготвям за седмицата. Бих искала и мобилно приложение."`,
+   how:`Стъпка 1: Събери отзиви от вградена форма, имейл или анкета.
+Стъпка 2: Постави — дори 15–20 отзива са достатъчни за добър анализ.
+💡 Съвет: Комбинирай с данни от платформата (най-сваляни ресурси) — виж промпт #28 за смесен анализ.`
+  },
+
+  {id:36,cat:'mkt',level:'basic',out:'text',tags:['campaign'],privacy:false,
+   d4:['description','delegation','discernment'],
+   d4how:{
+     description:'Уточни канала и аудиторията: имейл бюлетин към учители е различен от публикация в социалните мрежи за широката публика. Тонът и критериите за успех са различни.',
+     delegation:'Claude ще прочете всички отговори и ще открие кои послания резонират и кои объркват — без ти да четеш всеки имейл поотделно.',
+     discernment:'Хората, дали feedback за комуникацията, обикновено са или много доволни, или много недоволни. Имай предвид, че мълчаливото мнозинство може да мисли различно.',
+   },
+   title:'Анализ на обратна връзка за комуникация',
+   desc:'Разбира как аудиторията реагира на нашите съобщения — имейли, бюлетини, публикации.',
+   prompt:`Анализирай обратната връзка за нашата комуникация.
+
+Тип комуникация: [имейл бюлетин / публикация в социалните мрежи / прессъобщение / друго]
+Аудитория: [учители / alumni / донори / широка публика]
+
+1. РЕЗОНАНС — кои послания са се харесали или ангажирали аудиторията?
+2. ОБЪРКВАНЕ — нещо неразбрано или погрешно интерпретирано?
+3. ЛИПСВАЩА ИНФОРМАЦИЯ — какво са питали или търсили?
+4. ТОН — как е възприет тонът на комуникацията?
+5. ПРЕПОРЪКИ — конкретни промени за следващото съобщение
+
+Обратна връзка (отговори, коментари, реакции):
+[ПОСТАВИ]`,
+   example:`Имейл бюлетин до учители — отговори:
+"Много полезна информация, но имейлът е твърде дълъг. Прочитам само първите 2 параграфа."
+"Не разбрах как да се регистрирам за събитието — линкът не беше ясен."
+"Обичам историите от учители — те са най-вдъхновяващата част."
+"Получавам твърде много имейли от вас. Може ли да изберем честота?"
+"Страхотно резюме на програмата — препратих на колежка."`,
+   how:`Стъпка 1: Събери отговори на имейл, коментари от соц. мрежи или директен feedback.
+Стъпка 2: Постави в промпта с контекст за типа комуникация.
+💡 Съвет: Дори 10–15 отговора дават ясна картина. Не чакай голяма извадка.`
+  },
+
+  {id:37,cat:'mkt',level:'medium',out:'text',tags:['interview','survey'],privacy:false,
+   d4:['description','delegation','discernment','diligence'],
+   d4how:{
+     description:'Уточни кои аудитории сравняваш и защо. "Учители vs. донори" е различно от "млади учители vs. опитни" — нуждите от комуникация са коренно различни.',
+     delegation:'Сегментирането на комуникационни нужди от много отговори е сложна задача — делегирай категоризацията и препоръките изцяло.',
+     discernment:'Различните аудитории може да искат едно и също, но с различен тон. Провери дали препоръките отчитат нюансите, не само очевидните разлики.',
+     diligence:'Актуализирай анализа при важни промени в аудиторията — нова кохорта учители, нови донори. Комуникационните нужди се променят.',
+   },
+   title:'Комуникационни нужди по аудитории',
+   desc:'Открива как различните аудитории искат да бъдат комуникирани — канали, тон, честота, съдържание.',
+   prompt:`Анализирай данните за комуникационните предпочитания на нашите аудитории.
+
+Аудитории: [учители / alumni / донори / партньори / широка публика]
+
+За всяка аудитория идентифицирай:
+1. ПРЕДПОЧИТАНИ КАНАЛИ — имейл, соц. мрежи, лично, друго?
+2. ЧЕСТОТА — колко комуникация е достатъчна и колко е прекалено?
+3. ТИП СЪДЪРЖАНИЕ — какво намират за ценно?
+4. ТОН — формален, неформален, вдъхновяващ, практически?
+5. БОЛКИ — какво в сегашната ни комуникация не работи?
+
+Накрая: матрица с препоръки по аудитория.
+
+Данни (анкети, интервюта, коментари):
+[ПОСТАВИ]`,
+   example:`Учители: "Предпочитам практически съвети, не вдъхновителни цитати." / "Имейлите са твърде чести — веднъж месечно е достатъчно."
+Alumni: "Искам да знам какво се случва в общността, не само в програмата." / "Харесвам кратките обновления в WhatsApp групата."
+Донори: "Искам конкретни истории с измеримо въздействие, не общи твърдения." / "Тримесечният отчет е точно правилната честота."`,
+   how:`Стъпка 1: Събери данни от различни аудитории — анкети, интервюта, имейл отговори.
+Стъпка 2: Ако нямаш структурирани данни — дори неформални коментари и бележки от разговори работят.
+Стъпка 3: Резултатът може директно да информира комуникационна стратегия или редакционен календар.
+💡 Съвет: Поискай от Claude да генерира матрицата като таблица — лесна за споделяне с екипа.`
+  },
+
+  // ══ ПОДБОР НА УЧИТЕЛИ ══
+  {id:13,cat:'rec',level:'basic',out:'text',tags:['survey'],privacy:true,
+   d4:['description', 'delegation', 'discernment'],
+   d4how:{
+     'description': '⚠️ Анонимизирай ПРЕДИ всичко. После опиши профила на идеалния кандидат — Claude ще търси именно тези характеристики.',
+     'delegation': 'Claude може да извлече модели от 50+ писма за минути. Делегирай първичния скрийнинг, но финалното решение остава при хора.',
+     'discernment': 'Внимавай за bias: Claude може да засили съществуващи предразсъдъци ако профилът на "идеален кандидат" не е достатъчно разнообразен.',
+   },
+   title:'Анализ на мотивационни писма',
+   desc:'Открива теми и модели в кандидатурите — без да чете всяко писмо поотделно.',
+   prompt:`Анализирай следните мотивационни писма от кандидати за нашата програма.
+
+Търси:
+1. МОТИВАЦИЯ — защо искат да участват? Кои теми се повтарят?
+2. РАЗБИРАНЕ ЗА РОЛЯТА — как описват работата на учителя?
+3. ОБЕЩАВАЩИ СИГНАЛИ — идеи или нагласи, показващи висок потенциал
+4. ТРЕВОЖНИ СИГНАЛИ — нещо, изискващо допълнително изясняване
+5. РАЗНООБРАЗИЕ — какъв диапазон от опит и контекст?
+
+Писма:
+[ПОСТАВИ ПИСМАТА — АНОНИМИЗИРАЙ ИМЕНАТА ПРЕДВАРИТЕЛНО]`,
+   example:`Писмо 1 (анонимизирано): "Преподавам в малко село от 5 години. Чувствам се изолиран от колеги и нямам с кого да говоря за предизвикателствата. Искам да стана по-добър учител и да намеря общност от хора с подобни ценности."
+
+Писмо 2 (анонимизирано): "Завърших наскоро педагогика и се интересувам от иновативни методи. Вярвам, че образованието може да се промени, ако учителите се обединят."`,
+   how:`⚠️ ВАЖНО: Преди да поставяш мотивационни писма в LLM:
+1. Замени всички имена с [КАНДИДАТ 1], [КАНДИДАТ 2] и т.н.
+2. Изтрий имейл адреси, телефони и всякакви лични данни.
+3. Не поставяй повече от 20 писма наведнъж.
+4. Използвай резултата за предварителен скрийнинг — финалното решение е на хора.`
+  },
+  {id:14,cat:'rec',level:'medium',out:'text',tags:['interview'],privacy:true,
+   d4:['description', 'delegation', 'discernment'],
+   d4how:{
+     'description': '⚠️ Пълна анонимизация задължителна. После уточни критериите за оценка — Claude ще структурира анализа около тях.',
+     'delegation': 'Намирането на модели в 20+ интервюта е трудоемко. Claude ще открие кои въпроси разграничават добре кандидатите.',
+     'discernment': 'Анализът е помощен инструмент, не решение. Бележките на интервюиращите може да са непълни или субективни — вземи го предвид.',
+   },
+   title:'Анализ на интервюта за подбор',
+   desc:'Открива модели в интервютата и помага при структуриране на решенията.',
+   prompt:`Анализирай следните бележки от интервюта за подбор в програмата.
+
+Контекст: Търсим учители с [посочи профил].
+
+1. СИЛНИ КАНДИДАТИ — какви общи характеристики имат?
+2. ТРУДНИ РЕШЕНИЯ — кандидати с противоречиви сигнали — анализирай плюсовете и минусите
+3. МОДЕЛИ В ОТГОВОРИТЕ — кои въпроси разграничават добре кандидатите?
+4. ПРОПУСКИ В ИНТЕРВЮТО — теми, по които нямаме достатъчно данни
+5. ПРЕДЛОЖЕНИЕ ЗА РАМКА — критерии за оценка от 1 до 5
+
+Бележки:
+[ПОСТАВИ ДАННИТЕ — АНОНИМИЗИРАЙ]`,
+   example:`Кандидат А: "Говори за конкретни случаи с ученици — детайлно и с рефлексия. Показва способност да учи от грешките си. Малко несигурен за ангажимента от гледна точка на времето."
+Кандидат Б: "Много ентусиазиран, но отговорите са общи — трудно е да прецениш реалния опит. Добра самопрезентация."`,
+   how:`⚠️ ВАЖНО: Анонимизирай напълно преди да поставяш.
+Стъпка 1: Събери структурирани бележки от интервюиращите.
+Стъпка 2: Замени имената с букви или кодове (Кандидат А, Б, В...).
+Стъпка 3: Използвай анализа за обсъждане в екипа — не като автоматично решение.
+💡 Съвет: Поискай от Claude да идентифицира и bias-ове в бележките — полезно за по-справедлив подбор.`
+  },
+  {id:15,cat:'rec',level:'advanced',out:'text',tags:['survey','interview'],privacy:true,
+   d4:['description', 'delegation', 'discernment', 'diligence'],
+   d4how:{
+     'description': '⚠️ Пълна анонимизация и за двата набора данни. Уточни какво означава "успешен" — завършил програмата, останал в образованието, препоръчал я?',
+     'delegation': 'Сравнението между профили на alumni и кандидати е сложна задача, изискваща четене на много текстове едновременно — идеална за LLM.',
+     'discernment': 'Предикторите са корелации, не причинно-следствени връзки. Не отхвърляй кандидат само защото не "прилича" на минали alumni.',
+     'diligence': 'Актуализирай профила на "успешен участник" всяка година. Програмата се развива, и идеалният профил също.',
+   },
+   title:'Предиктори за успех — alumni vs. кандидати',
+   desc:'Открива дали новите кандидати показват характеристиките на успешните alumni.',
+   prompt:`Имам два набора данни:
+А) Профили на alumni, завършили успешно програмата
+Б) Мотивационни писма/интервюта на нови кандидати
+
+Задача: Открий дали новите кандидати показват характеристиките на успешните alumni.
+
+1. ПРОФИЛ НА УСПЕШЕН УЧАСТНИК — кои думи, нагласи, опит се повтарят при alumni?
+2. СЪВПАДЕНИЕ — кои кандидати показват тези характеристики?
+3. НОВИ ПРОФИЛИ — има ли кандидати с уникален, но обещаващ профил?
+4. ПРЕПОРЪКИ ЗА ИНТЕРВЮТАТА — на какво да обърнем внимание?
+
+Данни alumni: [ПОСТАВИ — АНОНИМИЗИРАЙ]
+Данни кандидати: [ПОСТАВИ — АНОНИМИЗИРАЙ]`,
+   example:`Alumni профили (фрагменти):
+"Говореше за конкретни ученици с имена и ситуации." / "Питаше много въпроси по време на обучението." / "Имаше готовност да признае, когато не знае нещо."
+
+Кандидат 1: "Преподавам от 8 години и мисля, че имам какво да науча и какво да дам."
+Кандидат 2: "Искам да стана по-добър учител. Чета много, но нямам кой да ми помага да прилагам."`,
+   how:`⚠️ ВАЖНО: Пълна анонимизация задължителна.
+Стъпка 1: Подготви кратки профили на успешни alumni (3–5 изречения на човек).
+Стъпка 2: Добави данните за кандидатите в същия формат.
+Стъпка 3: Използвай резултата като един от входовете при вземане на решение — не като единственото основание.`
+  },
+
+  // ══ СМЕСЕН АНАЛИЗ ══
+  {id:16,cat:'mixed',level:'basic',out:'text',tags:['scores'],privacy:false,
+   d4:['description', 'delegation', 'discernment'],
+   d4how:{
+     'description': 'Дай точните числа и посочи кои оценки са "ниски" за вашия контекст. 3.5/5 може да е ниско за вас, но нормално за друга организация.',
+     'delegation': 'Свързването на числа с текстови коментари е точно смесеният анализ, в който LLMs са силни. Делегирай изцяло.',
+     'discernment': 'Малка извадка при ниска оценка? Бъди внимателен с генерализациите — 3 коментара не са достатъчни за системен извод.',
+   },
+   title:'Обясни защо оценката е такава',
+   desc:'Дава съдържание и смисъл на числова оценка — идеален старт за смесен анализ.',
+   prompt:`Имам резултати от анкета. За всеки въпрос има числова оценка И отворен коментар.
+
+Числови оценки (средни стойности):
+[ПОСТАВИ — напр. "Полезност на обучението: 3.8/5", "Качество на менторството: 4.2/5"]
+
+Задача: За всяка оценка под 4.0 — анализирай коментарите на хората с тази ниска оценка.
+
+1. ЗАЩО Е НИСКА — кои теми се появяват в техните коментари?
+2. КОНКРЕТНИ ЦИТАТИ — 2–3 представителни изречения (анонимни)
+3. РАЗЛИКА — казват ли нещо различно от хората с висока оценка?
+4. ПРЕПОРЪКА — едно конкретно действие за повишаване на оценката
+
+Коментари на хората с ниски оценки:
+[ПОСТАВИ]`,
+   example:`Числови оценки:
+- Полезност на обучението: 3.6/5
+- Качество на менторството: 4.3/5
+- Приложимост в практиката: 3.2/5
+
+Коментари с ниска оценка за "Приложимост":
+"Темите бяха интересни, но нямаше как да ги приложа директно — работя с ученици специални нужди."
+"Липсваха конкретни примери как да работя с голям клас — 34 ученика."
+"Хубаво беше теоретично, но исках повече практика."`,
+   how:`Стъпка 1: Вземи средните оценки от анкетата (от Google Forms, Excel и т.н.).
+Стъпка 2: Филтрирай коментарите само на хората, дали ниска оценка (1–2 или 1–3).
+Стъпка 3: Постави числата и коментарите в промпта.
+💡 Съвет: Дори 5–6 коментара при ниска оценка дават ценни инсайти.`
+  },
+  {id:17,cat:'mixed',level:'basic',out:'text',tags:['scores'],privacy:false,
+   d4:['description', 'delegation', 'discernment'],
+   d4how:{
+     'description': 'Раздели ясно коментарите: промоутъри = 9–10, детрактори = 0–6. Неутралните (7–8) рядко коментират.',
+     'delegation': 'Claude ще открие защо хората препоръчват или не — анализ, трудно постижим без четене на всеки коментар.',
+     'discernment': 'NPS варира между индустрии. 42 може да е отличен за образователен сектор. Не сравнявай с търговски компании.',
+   },
+   title:'Интерпретация на NPS резултат',
+   desc:'Разбира какво стои зад NPS скора — защо препоръчват и защо не.',
+   prompt:`Имам NPS данни от анкета.
+
+NPS скор: [X]
+Промоутъри (9–10): [X%] | Неутрални (7–8): [X%] | Детрактори (0–6): [X%]
+
+Коментари от промоутъри:
+[ПОСТАВИ]
+
+Коментари от детрактори:
+[ПОСТАВИ]
+
+Задача:
+1. ЗАЩО НИ ПРЕПОРЪЧВАТ — топ 3 причини от промоутърите
+2. ЗАЩО НЕ НИ ПРЕПОРЪЧВАТ — топ 3 причини от детракторите
+3. РАЗЛИЧНИ ОЧАКВАНИЯ — говорят ли за различни неща?
+4. БЪРЗИ ПОБЕДИ — кое е лесно за поправяне?
+5. ЦИТАТ ЗА КОМУНИКАЦИЯ — едно изречение от промоутър за публично споделяне`,
+   example:`NPS скор: 42
+Промоутъри: 58% | Неутрални: 26% | Детрактори: 16%
+
+Промоутъри: "Програмата промени начина ми на гледане на преподаването." / "Общността е невероятна — все още се чувам с колеги от групата."
+
+Детрактори: "Твърде много административна работа за малко реална практика." / "Очаквах повече персонализиран подход — беше много групово."`,
+   how:`Стъпка 1: Вземи NPS данните от твоята анкетна платформа.
+Стъпка 2: Раздели коментарите на промоутъри (оценили 9–10) и детрактори (оценили 0–6).
+Стъпка 3: Постави числата и двете групи коментари.
+💡 Съвет: Неутралните (7–8) обикновено не коментират — нормално е да нямаш данни за тях.`
+  },
+  {id:18,cat:'mixed',level:'medium',out:'text',tags:['scores'],privacy:false,
+   d4:['description', 'delegation', 'discernment', 'diligence'],
+   d4how:{
+     'description': 'Форматирай данните като таблица: Оценка | Коментар. Не са нужни имена или допълнителна информация.',
+     'delegation': 'Намирането на корелации между числови оценки и текстови теми е сложна задача — делегирай изцяло.',
+     'discernment': 'Драйверите са хипотези, не доказани факти. Потвърди с допълнителни данни или разговор с участници.',
+     'diligence': 'Запази анализа на драйверите. Сравнявай между години — подобряват ли се нещата, където сте инвестирали?',
+   },
+   title:'Драйвъри на удовлетвореността',
+   desc:'Открива кои теми се свързват с високи и ниски оценки — по-богато от средна стойност.',
+   prompt:`Имам данни от анкета: числови оценки (1–5) + коментари за всеки респондент.
+
+Формат (един ред на респондент):
+Оценка | Коментар
+[ПОСТАВИ ДАННИТЕ]
+
+Задача:
+1. ВИСОКА ОЦЕНКА (4–5) — кои теми се споменават най-често?
+2. НИСКА ОЦЕНКА (1–2) — кои теми се споменават най-често?
+3. КЛЮЧОВИ ДРАЙВЪРИ — кои фактори изглеждат свързани с висока удовлетвореност?
+4. КЛЮЧОВИ ПРЕЧКИ — кои фактори се свързват с ниски оценки?
+5. ПРЕПОРЪКИ — топ 3 подобрения по потенциален ефект`,
+   example:`Оценка | Коментар
+5 | "Менторът ми помогна да сменя начина си на работа с трудни ученици. Реална промяна."
+4 | "Обученията бяха полезни, но понякога твърде дълги за един ден."
+2 | "Очаквах повече практика. Беше твърде теоретично за мен."
+5 | "Общността е огромна добавена стойност — все още се чуваме."
+1 | "Не намерих приложение в моя специфичен контекст — преподавам профилирана паралелка."
+4 | "Добро обучение, но липсваше последващо проследяване."`,
+   how:`Стъпка 1: Вземи данните от анкетата в Excel/Google Sheets.
+Стъпка 2: Копирай колоните "Оценка" и "Коментар" — не са нужни имена.
+Стъпка 3: Постави директно в промпта.
+💡 Съвет: Работи добре с 20+ реда. Ако имаш много данни — подавай на групи от 30–40 реда.`
+  },
+  {id:19,cat:'mixed',level:'medium',out:'text',tags:['scores','survey'],privacy:false,
+   d4:['description', 'delegation', 'discernment', 'diligence'],
+   d4how:{
+     'description': 'Бъди точен с периодите и броя участници. Разликите в извадката между вълните влияят на сравнимостта.',
+     'delegation': 'Сравнението на качествени данни между периоди е трудоемко ръчно. Claude ще открие промени в езика и темите автоматично.',
+     'discernment': 'Промяната в оценките — реална промяна или различна извадка? Проверявай дали групите са сравними.',
+     'diligence': 'Тенденциите са най-ценният резултат. Запази всички вълни за longitudinal анализ след 3–4 години.',
+   },
+   title:'Тенденции — сравнение между години/вълни',
+   desc:'Открива как се е променило настроението и оценките между два или повече периода.',
+   prompt:`Имам данни от [брой] вълни на анкетиране — числови оценки И коментари.
+
+ВЪЛНА 1 — [период]:
+Средни оценки: [ПОСТАВИ]
+Представителни коментари: [ПОСТАВИ]
+
+ВЪЛНА 2 — [период]:
+Средни оценки: [ПОСТАВИ]
+Представителни коментари: [ПОСТАВИ]
+
+Анализирай:
+1. ПРОМЕНИ В ОЦЕНКИТЕ — кои са се подобрили? Влошили?
+2. ПРОМЕНИ В ТЕМИТЕ — говорят ли за различни неща?
+3. ХИПОТЕЗИ — какво може да обяснява промените?
+4. СТАБИЛНИ ТЕМИ — кое е постоянно?
+5. ПРЕПОРЪКА — на какво да обърнем внимание в следващия цикъл?`,
+   example:`ВЪЛНА 1 (2022–23):
+Удовлетвореност: 3.8/5 | Приложимост: 3.4/5
+Коментари: "Полезно, но твърде натоварено." / "Менторите са нови — усещам се, понякога учат с нас."
+
+ВЪЛНА 2 (2023–24):
+Удовлетвореност: 4.2/5 | Приложимост: 4.0/5
+Коментари: "Усеща се, че програмата е по-зряла." / "Менторите са много по-уверени тази година."`,
+   how:`Стъпка 1: Вземи средните оценки от двете години (от Excel или анкетната платформа).
+Стъпка 2: Избери 5–8 представителни коментара от всяка вълна.
+Стъпка 3: Постави в промпта.
+💡 Съвет: Ако имаш 3 вълни — добави и трета секция. Работи по същия начин.`
+  },
+  {id:20,cat:'mixed',level:'medium',out:'text',tags:['scores','survey'],privacy:false,
+   d4:['description', 'delegation', 'discernment'],
+   d4how:{
+     'description': 'Уточни дали групите са сравними по размер и профил. Ако не са — изводите трябва да са по-предпазливи.',
+     'delegation': 'Claude ще открие не само разликите, но и обяснения в самите коментари — защо резултатите се различават между групите.',
+     'discernment': 'Разликите може да отразяват контекстуални фактори (размер на града, тип училище), а не качеството на програмата. Формулирай изводите внимателно.',
+   },
+   title:'Сравнение между групи (региони, години)',
+   desc:'Открива значими разлики между различни групи участници с числа и качествени обяснения.',
+   prompt:`Имам данни от различни групи — числови оценки И коментари.
+
+ГРУПА А — [напр. "Учители от София"]:
+Средни оценки: [ПОСТАВИ]
+Коментари: [ПОСТАВИ]
+
+ГРУПА Б — [напр. "Учители от малки градове"]:
+Средни оценки: [ПОСТАВИ]
+Коментари: [ПОСТАВИ]
+
+Анализирай:
+1. ЧИСЛОВИ РАЗЛИКИ — при кои въпроси има значима разлика?
+2. КАЧЕСТВЕНИ РАЗЛИКИ — говорят ли за различни неща?
+3. ОБЯСНЕНИЕ — какво в коментарите обяснява числовите разлики?
+4. ОБЩИ НУЖДИ — кое е еднакво важно за двете групи?
+5. ПРЕПОРЪКА — трябва ли да адаптираме програмата? Как?`,
+   example:`ГРУПА А (Sofia, N=24):
+Удовлетвореност: 4.1/5 | Приложимост: 4.3/5
+Коментари: "Имам колеги наблизо с които да обсъждам." / "Лесно стигам до допълнителни ресурси в града."
+
+ГРУПА Б (Малки градове, N=18):
+Удовлетвореност: 4.4/5 | Приложимост: 3.6/5
+Коментари: "Обучението е страхотно, но после се прибирам в изолация." / "Нямам с кого да приложа наученото — колегите не са преминали програмата."`,
+   how:`Стъпка 1: Раздели данните по групи в Excel.
+Стъпка 2: Изчисли средните оценки за всяка група.
+Стъпка 3: Избери представителни коментари от всяка група.
+💡 Съвет: Работи добре с 2–4 групи. При повече — направи отделни сравнения по двойки.`
+  },
+  {id:21,cat:'mixed',level:'medium',out:'text',tags:['scores'],privacy:false,
+   d4:['description', 'delegation', 'discernment', 'diligence'],
+   d4how:{
+     'description': 'Дай числата за всеки етап от фунията. Дори приблизителни числа са полезни — разликите са важни, не точните стойности.',
+     'delegation': 'Свързването на поведенчески данни (отпаднал при какъв етап) с качествени причини е сложен анализ — делегирай изцяло.',
+     'discernment': 'Коментарите при отказ са рядко представителни — хората, дали feedback, са различни от тези, отпаднали мълчаливо.',
+     'diligence': 'Повтаряй анализа всяка кампания. Проблемите с формата или неясните изисквания са лесни за поправяне — ако знаеш за тях.',
+   },
+   title:'Анализ на конверсии при подбор',
+   desc:'Комбинира данни за брой кандидати и коментари за да разбере защо хората кандидатстват или отпадат.',
+   prompt:`Имам данни за кампанията за набиране на учители.
+
+ЧИСЛА:
+- Брой достигнати: [X]
+- Брой започнали кандидатура: [X]
+- Брой завършили кандидатура: [X]
+- Брой одобрени: [X]
+
+КОМЕНТАРИ от кандидати (защо са кандидатствали / отказали):
+[ПОСТАВИ]
+
+Анализирай:
+1. МОТИВАТОРИ — кое е накарало хората да кандидатстват?
+2. БАРИЕРИ — кое е спирало потенциални кандидати?
+3. ТОЧКИ НА ОТПАДАНЕ — при кой етап отпадат и защо?
+4. РАЗЛИКА — различават ли се коментарите на завършилите от тези, отпаднали по-рано?
+5. ПРЕПОРЪКИ — 3 конкретни промени за следващата кампания`,
+   example:`ЧИСЛА:
+Достигнати: 2400 | Започнали кандидатура: 340 | Завършили: 180 | Одобрени: 52
+
+КОМЕНТАРИ:
+"Исках да кандидатствам, но формата беше твърде дълга — отказах се." (отпаднал)
+"Препоръча ми приятелка — нямаше как да не опитам." (завършил)
+"Не бях сигурен дали отговарям на изискванията — нямаше ясно обяснение." (отпаднал)`,
+   how:`Стъпка 1: Вземи числата от CRM или анкетната платформа.
+Стъпка 2: Събери коментари от кандидатурната форма или имейли при отказ.
+Стъпка 3: Постави всичко в промпта.
+💡 Съвет: Дори 10 коментара от отпаднали кандидати са много ценни.`
+  },
+  {id:22,cat:'mixed',level:'advanced',out:'text',tags:['scores','survey'],privacy:false,
+   d4:['description', 'delegation', 'discernment', 'diligence'],
+   d4how:{
+     'description': 'Уточни аудиторията в самото начало: борд иска различен тон от корпоративен донор. Добави кои числа са "добри" за вашия контекст.',
+     'delegation': 'Синтезирането на числа и цитати в убедителен едностраничен документ е трудоемко. Делегирай структурата и черновата изцяло.',
+     'discernment': 'Executive summary-то точно ли балансира успехите с предизвикателствата? Прекалено позитивните доклади губят доверие.',
+     'diligence': 'Запази шаблона. Следващото тримесечие — само актуализирай числата и цитатите.',
+   },
+   title:'Executive summary за борд и донори',
+   desc:'Синтезира числа и цитати в кратък убедителен доклад — максимум 1 страница.',
+   prompt:`Действай като старши анализатор. Изгради executive summary, комбиниращ числата и гласовете на участниците.
+
+Аудитория: [управителен съвет / донори / партньори]
+Период: [напр. "Учебна година 2023–2024"]
+
+ЧИСЛА:
+- Брой участници: [X]
+- % завършили: [X%]
+- Средна оценка: [X/5]
+- NPS: [X]
+- [Добави други метрики]
+
+КАЧЕСТВЕНИ ДАННИ (ключови теми и цитати):
+[ПОСТАВИ]
+
+СТРУКТУРА (максимум 1 страница):
+1. РЕЗУЛТАТИ С ЕДИН ПОГЛЕД — 3 числа + 1 изречение за всяко
+2. КАКВО КАЗВАТ УЧАСТНИЦИТЕ — 3 анонимни цитата
+3. КАКВО РАБОТИ — 2 изречения
+4. КАКВО ПОДОБРЯВАМЕ — 2 изречения (честно, конструктивно)
+5. СЛЕДВАЩА СТЪПКА — едно конкретно действие с дата`,
+   example:`ЧИСЛА:
+Участници: 87 учители | Завършили: 94% | Средна оценка: 4.2/5 | NPS: 48
+
+КАЧЕСТВЕНИ ДАННИ:
+Топ теми: менторство, приложимост, общност
+Цитати: "Промени начина ми на работа с трудни ученици." / "Исках повече практика в началото." / "Общността е огромна добавена стойност."`,
+   how:`Стъпка 1: Вземи ключовите числа от таблото с данни.
+Стъпка 2: Добави 5–10 представителни цитата или теми от качествения анализ.
+Стъпка 3: Уточни аудиторията — тонът за борд е различен от този за корпоративен донор.
+💡 Съвет: Генерирай 2 версии — кратка (1 страница) за борд и разширена (3 стр.) за донори.`
+  },
+  {id:23,cat:'mixed',level:'advanced',out:'table',tags:['scores','survey'],privacy:false,
+   d4:['description', 'delegation', 'diligence'],
+   d4how:{
+     'description': 'Форматирай входа точно: ID | Оценка | Коментар — без допълнителни колони. Claude ще попълни останалото.',
+     'delegation': 'Кодирането на стотици отговора в структурирана таблица е класическа задача за LLMs. 30–40 реда за под минута.',
+     'diligence': 'Запази кодовата схема (темите). При следваща анкета — кажи на Claude да използва същите теми за сравнимост.',
+   },
+   title:'Таблица за Excel — кодиране на отговори',
+   desc:'Подготвя данни за по-нататъшен анализ в Excel — готова за копиране директно.',
+   prompt:`Анализирай следните отговори и върни резултата като таблица за Excel.
+
+Формат на входа (един ред на респондент):
+ID | Оценка (1–5) | Коментар
+
+[ПОСТАВИ ДАННИТЕ]
+
+Върни таблица с колони:
+| ID | Оценка | Сентимент | Основна_тема | Вторична_тема | Споменава_подобрение | Изисква_действие | Ключов_цитат |
+
+Легенда:
+- Сентимент: Позитивен / Неутрален / Негативен / Смесен
+- Основна_тема: кратка фраза на български
+- Вторична_тема: ако има (иначе "—")
+- Споменава_подобрение: Да / Не
+- Изисква_действие: Да / Не
+- Ключов_цитат: до 12 думи
+
+Върни САМО таблицата — без обяснения.`,
+   example:`ID | Оценка | Коментар
+001 | 5 | "Менторът ми помогна да сменя подхода към трудни ученици. Огромна промяна."
+002 | 2 | "Твърде теоретично. Нямах как да приложа нещата директно в моя клас."
+003 | 4 | "Добро обучение, но обратната връзка понякога закъсняваше с дни."`,
+   how:`Стъпка 1: Вземи данните от Google Forms или Excel.
+Стъпка 2: Подготви ги в колони ID | Оценка | Коментар.
+Стъпка 3: Постави в промпта — Claude ще върне готова таблица.
+Стъпка 4: Копирай таблицата директно в Excel или Google Sheets.
+💡 Съвет: Работи до 30–40 реда наведнъж. При повече — разбий на части.`
+  },
+  {id:24,cat:'mixed',level:'advanced',out:'json',tags:['scores','survey'],privacy:false,
+   d4:['description', 'delegation', 'diligence'],
+   d4how:{
+     'description': 'Уточни типа респонденти преди да подадеш данните. JSON структурата ще се адаптира към контекста.',
+     'delegation': 'JSON изходът позволява директна интеграция с Power BI, Airtable или друга система. Делегирай трансформацията изцяло.',
+     'diligence': 'Автоматизацията е най-голямата стойност тук. Запази промпта и го използвай всяка вълна — еднакъв изход, лесен за сравнение.',
+   },
+   title:'JSON изход за системи и бази данни',
+   desc:'Кодира отговорите в машинно-четим формат — за свързване с CRM, Power BI или база данни.',
+   prompt:`Анализирай следните отговори и върни САМО валиден JSON — без текст преди или след.
+
+За всеки отговор:
+{
+  "id": пореден номер,
+  "respondent_type": "teacher"|"alumni"|"candidate"|"donor",
+  "sentiment": "positive"|"neutral"|"negative"|"mixed",
+  "score": 1–5,
+  "themes": ["тема1", "тема2"],
+  "key_quote": "до 15 думи",
+  "mentions_improvement": true|false,
+  "action_needed": true|false
+}
+
+Тип на респондентите: [учители / alumni / кандидати / донори]
+
+Данни:
+[ПОСТАВИ]
+
+Върни: { "total": N, "avg_score": X.X, "results": [...] }`,
+   example:`Данни:
+001 | 5 | "Менторът промени подхода ми към трудни ученици."
+002 | 2 | "Твърде теоретично — нямах как да приложа нещата."
+003 | 4 | "Добро обучение, обратната връзка понякога закъсняваше."`,
+   how:`Стъпка 1: Подготви данните в прост формат (ID | Оценка | Коментар).
+Стъпка 2: Постави в промпта и изпрати.
+Стъпка 3: Копирай JSON изхода и импортирай в системата.
+💡 Съвет: JSON форматът е полезен ако използвате Power BI, Airtable, Notion или имате разработчик в екипа.`
+  },
+  {id:25,cat:'mixed',level:'advanced',out:'text',tags:['scores','survey','interview'],privacy:false,
+   d4:['description', 'delegation', 'discernment', 'diligence'],
+   d4how:{
+     'description': 'Събери всички данни ПРЕДИ да подадеш. Неизползваните данни (без посещения, без alumni оценки) — маркирай ги с N/A, не ги пропускай.',
+     'delegation': 'Годишният доклад е най-сложният синтез — данни от 5+ източници в един нарратив. Точно тук LLMs спестяват дни работа.',
+     'discernment': 'Черновата е отправна точка, не финален текст. Проверявай всяко число, всеки цитат. Организацията ти стои зад документа.',
+     'diligence': 'Запази структурата на доклада. Следващата година — сравни разделите директно. Тенденциите между годините са най-ценното.',
+   },
+   title:'Годишен impact доклад — пълен микс',
+   desc:'Синтезира числа и качествени данни от цялата година в нарративен доклад за въздействие.',
+   prompt:`Действай като анализатор на образователно въздействие.
+
+Данни за [година]:
+
+ЧИСЛА:
+- Учители: [X] | % завършили: [X%] | Оценка: [X/5] | NPS: [X]
+- Alumni анкетирани: [X] | Средна оценка: [X/5]
+- Кандидати: [X] | Приети: [X] ([X%] конверсия)
+- Посещения платформа: [X] | Свалени ресурси: [X]
+
+КАЧЕСТВЕНИ ДАННИ:
+Топ теми от учители: [ПОСТАВИ]
+Топ теми от alumni: [ПОСТАВИ]
+Представителни цитати: [ПОСТАВИ]
+
+СТРУКТУРА:
+1. ГОДИНАТА В 3 ЧИСЛА И 3 ЦИТАТА
+2. ГЛАСЪТ НА УЧИТЕЛИТЕ
+3. ДЪЛГОСРОЧНО ВЪЗДЕЙСТВИЕ (alumni)
+4. НАШАТА ОБЩНОСТ (платформа, кампании)
+5. ПРЕДИЗВИКАТЕЛСТВА — честен поглед
+6. ПОГЛЕД НАПРЕД — 3 приоритета
+7. ЦИТАТИ ЗА ПУБЛИЧНА КОМУНИКАЦИЯ — 5 изречения
+
+Тон: топъл, автентичен, основан на данни
+Аудитория: [донори / борд / публичен доклад]`,
+   example:`ЧИСЛА:
+Учители: 87 | Завършили: 94% | Оценка: 4.2/5 | NPS: 48
+Alumni: 134 анкетирани | Оценка: 4.0/5
+Кандидати: 340 | Приети: 52 (15%)
+
+КАЧЕСТВЕНИ ДАННИ:
+Топ теми от учители: менторство, приложимост, общност
+Alumni цитат: "Програмата ме накара да остана в образованието."`,
+   how:`Стъпка 1: Събери числата от таблото с данни (Google Sheets, CRM и т.н.).
+Стъпка 2: Добави синтезирани теми и 5–8 цитата от различни анкети.
+Стъпка 3: Уточни аудиторията — важно за тона.
+💡 Съвет: Генерирай чернова с Claude, после я редактирай с екипа. Спестява 80% от времето.`
+  },
+  // ══ ПАРТНЬОРСТВА ══
+  {id:26,cat:'part',level:'basic',out:'text',tags:['interview'],privacy:false,
+   d4:['description','delegation','discernment'],
+   d4how:{
+     description:'Уточни типа партньор: корпоративен донор, училище, институция, НПО. Контекстът определя как да тълкуваме очакванията.',
+     delegation:'Claude ще извлече ключовите теми и очаквания от срещата, без ти да препрочиташ бележките многократно.',
+     discernment:'Партньорите понякога казват едно, но имат предвид друго. Провери дали изводите са в съответствие с по-широкия контекст на отношенията.',
+   },
+   title:'Анализ на бележки от партньорска среща',
+   desc:'Извлича ключови теми, очаквания и следващи стъпки от срещи с партньори.',
+   prompt:`Анализирай следните бележки от среща с партньор.
+
+Тип партньор: [корпоративен / училище / институция / друго НПО]
+Цел на срещата: [установяване на контакт / текущ партньор / преговори / отчет]
+
+Извлечи:
+1. КЛЮЧОВИ ТЕМИ — за какво говорихме основно?
+2. ОЧАКВАНИЯ НА ПАРТНЬОРА — какво искат от нас?
+3. НАШИТЕ АНГАЖИМЕНТИ — какво сме обещали (явно или косвено)?
+4. РИСКОВЕ И ТРЕВОГИ — нещо, което звучи като потенциален проблем?
+5. СЛЕДВАЩИ СТЪПКИ — конкретни действия с отговорник и срок
+
+Бележки от срещата:
+[ПОСТАВИ БЕЛЕЖКИТЕ]`,
+   example:`Среща с HR директор на корпоративен партньор, 15.10.2024
+
+Разговаряхме за продължаване на партньорството за следващата година. Те искат по-видима комуникация за въздействието — конкретни истории от учители, не само числа. Споменаха, че техният борд задава въпроси за измеримост. Попитаха дали можем да организираме посещение в училище. Казах, че ще проверим с екипа. Останахме да се чуем до края на месеца.`,
+   how:``},
+
+  {id:27,cat:'part',level:'medium',out:'text',tags:['survey'],privacy:false,
+   d4:['description','delegation','discernment','diligence'],
+   d4how:{
+     description:'Добави контекст за партньора: колко дълго работите заедно, какъв е типът на партньорството (финансово, програмно, комуникационно).',
+     delegation:'Анализът на партньорски feedback изисква четене между редовете — делегирай извличането на скритите очаквания и тревоги.',
+     discernment:'Партньорите рядко казват директно какво ги притеснява. Провери дали Claude е открил подтекстите, не само изричното.',
+     diligence:'Сравнявай feedback между години. Промяната в тона на партньорите е ранен сигнал за риск или възможност.',
+   },
+   title:'Анализ на партньорски feedback',
+   desc:'Разбира очакванията, удовлетвореността и рисковете в партньорските отношения.',
+   prompt:`Анализирай следния feedback от наши партньори.
+
+Контекст: [тип партньорство, продължителност, какво предоставяме/получаваме]
+
+1. УДОВЛЕТВОРЕНОСТ — колко доволни изглеждат и от какво?
+2. ОЧАКВАНИЯ — изрични и неизрични очаквания към нас
+3. ДОБАВЕНА СТОЙНОСТ — какво ценят най-много в партньорството?
+4. РИСКОВЕ — сигнали за разочарование или несъответствие на очакванията
+5. ПРЕПОРЪКИ — как да задълбочим или подобрим отношенията?
+
+Feedback от партньори:
+[ПОСТАВИ ДАННИТЕ]`,
+   example:`Партньор 1 (корпоративен, 3 г.): Ценим работата ви, но понякога е трудно да обясним на нашия борд конкретното въздействие. Имате ли по-кратки истории с числа?
+Партньор 2 (училище, 1 г.): Програмата е страхотна, но координацията между вашите хора и нас понякога е объркваща — не знаем кой е нашето едно лице за контакт.
+Партньор 3 (фондация, 5 г.): Доволни сме от прозрачността. Годишният доклад е много добре направен.`,
+   how:``},
+
+  {id:28,cat:'part',level:'advanced',out:'text',tags:['survey','interview'],privacy:false,
+   d4:['description','delegation','discernment'],
+   d4how:{
+     description:'Дефинирай ясно какво е "успешно партньорство" за вас — по какви критерии ще оцениш? Без това рамката е неясна.',
+     delegation:'Сравнението на много партньори по множество критерии е сложна матрична задача — делегирай изцяло.',
+     discernment:'Партньорите с висока оценка не са задължително стратегически важни. Провери дали анализът отчита стратегическото значение, не само удовлетвореността.',
+   },
+   title:'Картографиране на партньорско портфолио',
+   desc:'Оценява всички партньорства по ангажираност, стойност и потенциал — помага при приоритизиране.',
+   prompt:`Анализирай нашето партньорско портфолио въз основа на следните данни.
+
+За всеки партньор имам: [тип данни — бележки от срещи / анкети / имейл комуникация]
+
+Оцени всеки партньор по:
+1. НИВО НА АНГАЖИРАНОСТ — активни, пасивни или в риск?
+2. СТОЙНОСТ ЗА НАС — финансова, репутационна, програмна
+3. СТОЙНОСТ ЗА ТЯХ — какво получават от партньорството?
+4. ПОТЕНЦИАЛ — има ли пространство за задълбочаване?
+5. ПРЕПОРЪЧАНО ДЕЙСТВИЕ — поддържай / задълбочи / преосмисли
+
+Накрая: кои 3 партньорства заслужават най-много внимание тази година?
+
+Данни по партньори:
+[ПОСТАВИ]`,
+   example:`Партньор А (корпоративен, 50 000 лв/г): Редовна комуникация, посещение в училище миналата година, питат за измеримост.
+Партньор Б (фондация, грант 30 000 лв): Малко комуникация, доволни от отчета, не са питали за подновяване.
+Партньор В (училище, програмен): Много активни, директорът препоръчва на колеги, но не дават финансиране.`,
+   how:``},
+
+  // ══ СЪБИТИЯ ══
+  {id:29,cat:'events',level:'basic',out:'text',tags:['survey'],privacy:false,
+   d4:['description','delegation','discernment'],
+   d4how:{
+     description:'Уточни типа събитие: обучение, конференция, нетуъркинг, публично. Различните формати имат различни критерии за успех.',
+     delegation:'Анализът на стотици анкети след събитие е класическа задача за LLMs — делегирай категоризацията и синтеза изцяло.',
+     discernment:'Хората са по-позитивни в анкети веднага след събитие. Имай предвид това при интерпретацията на много високите оценки.',
+   },
+   title:'Обратна връзка след събитие',
+   desc:'Анализира анкетите след събитие — какво е работило, какво не и как да подобрим следващото.',
+   prompt:`Анализирай обратната връзка след нашето събитие.
+
+Тип събитие: [конференция / обучение / нетуъркинг / публично]
+Брой участници: [X]
+Брой попълнени анкети: [X]
+
+1. ОБЩО ВПЕЧАТЛЕНИЕ — каква е общата нагласа?
+2. СИЛНИ ЕЛЕМЕНТИ — кои части са оценени най-добре?
+3. СЛАБИ ЕЛЕМЕНТИ — кои части са предизвикали критики?
+4. ЛОГИСТИКА — коментари за организация, място, времетраене
+5. СЪДЪРЖАНИЕ — коментари за качеството на програмата
+6. ПРЕПОРЪКИ ЗА СЛЕДВАЩОТО СЪБИТИЕ — топ 3 конкретни промени
+
+Отговори:
+[ПОСТАВИ]`,
+   example:`Страхотна организация, но малко прекалено плътна програма — нямаше време за неформални разговори.
+Лекторите бяха вдъхновяващи. Особено панелът с учители — чувствах, че говорят за реалния ми опит.
+Залата беше трудна за намиране. Указателните табели бяха недостатъчни.
+Бих искал повече практически workshop-ове, не само презентации.
+Перфектна продължителност — един ден е точното.`,
+   how:``},
+
+  {id:30,cat:'events',level:'medium',out:'text',tags:['survey','scores'],privacy:false,
+   d4:['description','delegation','discernment','diligence'],
+   d4how:{
+     description:'Добави контекст: целта на събитието, целевата аудитория, дали е повтарящо се или ново.',
+     delegation:'Сравнението между различни издания изисква четене на много данни — делегирай синтеза и идентифицирането на тенденции.',
+     discernment:'Промяната в оценките може да отразява различна аудитория, не само различна организация. Проверявай дали извадките са сравними.',
+     diligence:'Запази структурата на анализа. При всяко следващо издание — попълни същия шаблон за лесно сравнение.',
+   },
+   title:'Сравнителен анализ между издания на събитие',
+   desc:'Проследява как се развива качеството на повтарящо се събитие между различните му издания.',
+   prompt:`Сравни обратната връзка от различните издания на [НАЗВАНИЕ НА СЪБИТИЕ].
+
+ИЗДАНИЕ 1 — [дата, брой участници]:
+Средни оценки: [ПОСТАВИ]
+Ключови коментари: [ПОСТАВИ]
+
+ИЗДАНИЕ 2 — [дата, брой участници]:
+Средни оценки: [ПОСТАВИ]
+Ключови коментари: [ПОСТАВИ]
+
+1. КАКВО СЕ ПОДОБРИ — елементи с по-добри оценки/коментари
+2. КАКВО СЕ ВЛОШИ — нещо с по-лоша обратна връзка
+3. УСТОЙЧИВИ ТЕМИ — повтарящи се коментари и в двете издания
+4. ПРОМЯНА В АУДИТОРИЯТА — говорят ли за различни неща?
+5. ПРЕПОРЪКИ — на какво да наблегнем при следващото издание?`,
+   example:`ИЗДАНИЕ 1 (2023, 80 уч.): Съдържание 4.2, Организация 3.8 | "Малко тесен venue." / "Страхотни говорители." / "Липсваха workshop-ове."
+ИЗДАНИЕ 2 (2024, 120 уч.): Съдържание 4.4, Организация 4.1 | "По-просторно място." / "Програмата беше твърде дълга." / "Добавените workshop-ове бяха хит."`,
+   how:``},
+
+  // ══ МАТЕРИАЛИ ЗА УЧИТЕЛИ ══
+  {id:31,cat:'content',level:'basic',out:'text',tags:['survey'],privacy:false,
+   d4:['description','delegation','discernment'],
+   d4how:{
+     description:'Уточни за кой тип учители е материалът: по предмет, опит, тип училище. Колкото по-специфична е аудиторията, толкова по-полезен е анализът.',
+     delegation:'Claude може да анализира обратна връзка за материали и да предложи конкретни редакции — делегирай категоризацията на критиките.',
+     discernment:'Учителите са разнородна аудитория. Критика от начинаещ и от опитен може да звучи еднакво, но да изисква различен отговор.',
+   },
+   title:'Обратна връзка за учителски ресурс',
+   desc:'Анализира как учителите оценяват конкретен материал — какво работи и какво да се промени.',
+   prompt:`Анализирай обратната връзка за нашия ресурс/материал.
+
+Тип ресурс: [ръководство / видео / шаблон / инструмент / обучителен модул]
+Целева аудитория: [тип учители]
+
+1. ПОЛЕЗНОСТ — смятат ли учителите, че ресурсът е приложим?
+2. ЯСНОТА — разбираем ли е езикът и структурата?
+3. ЛИПСВАЩИ ЕЛЕМЕНТИ — какво биха добавили?
+4. ПРИЛАГАНЕ — как планират да го използват?
+5. ПРЕПОРЪКИ ЗА РЕДАКЦИЯ — конкретни промени по приоритет
+
+Обратна връзка:
+[ПОСТАВИ]`,
+   example:`Примерите са чудесни, но са само за горен курс. Работя с 1-2 клас и ми трябват адаптации.
+Накрая разбрах идеята, но трябваше да прочета три пъти. Може ли по-кратко резюме в началото?
+Шаблонът за обратна връзка е точно това, от което имах нужда. Веднага го пробвах с клас 6б.
+Видеото е добро, но е твърде дълго — 20 минути е много за едно понятие.`,
+   how:``},
+
+  {id:32,cat:'content',level:'medium',out:'text',tags:['survey','interview'],privacy:false,
+   d4:['description','delegation','discernment'],
+   d4how:{
+     description:'Опиши какви нужди искаш да покриеш и за кого. "Материали за всички учители" е твърде широко — стесни до конкретна ситуация.',
+     delegation:'Идентифицирането на пропуски в съдържание от много разговори и анкети е сложна задача — делегирай синтеза изцяло.',
+     discernment:'Разграничи "искам това" от "имам нужда от това". Учителите понякога искат повече теория, но всъщност имат нужда от практически инструменти.',
+   },
+   title:'Идентифициране на нужди от съдържание',
+   desc:'Открива какви материали учителите търсят, но не намират — основа за планиране на нови ресурси.',
+   prompt:`Анализирай следните данни, за да идентифицираме нужди от нови материали за учители.
+
+Данни: [анкети / интервюта / коментари от платформата / въпроси на обучения]
+
+1. ИЗРИЧНИ НУЖДИ — конкретни ресурси, поискани директно
+2. СКРИТИ НУЖДИ — предизвикателства, споменати без конкретно искане
+3. ТЕМИ С ВИСОКА ЧЕСТОТА — за какво питат най-много?
+4. ПРОПУСКИ В ТЕКУЩОТО НИ СЪДЪРЖАНИЕ — какво ни липсва?
+5. ПРИОРИТИЗИРАНЕ — кои 3 нови ресурса биха имали най-голям ефект?
+
+Данни:
+[ПОСТАВИ]`,
+   example:`Имате ли нещо за работа с родители на трудни ученици? Много ми трябва.
+Търся практически стратегии за диференцирано обучение в смесени класове.
+Вашите ресурси за оценяване са добри, но нямате нищо за самооценка на учениците.
+Въпрос на обучение: как да обясня на директора защо ми трябват повече ресурси?`,
+   how:``},
+
+  // ══ ПРОЕКТИ & ОТЧЕТНОСТ ══
+  {id:33,cat:'projects',level:'basic',out:'text',tags:['interview'],privacy:false,
+   d4:['description','delegation','discernment'],
+   d4how:{
+     description:'Уточни за кого е отчетът: вътрешен екип, борд или донор. Нивото на детайл и тонът са коренно различни за трите аудитории.',
+     delegation:'Синтезът на бележки от много срещи и имейли в структуриран отчет е точно работата за LLM — делегирай структурирането изцяло.',
+     discernment:'Отчетът точно ли отразява реалността? Провери дали успехите са реалистично представени и предизвикателствата не са омаловажени.',
+   },
+   title:'Синтез на прогрес по проект',
+   desc:'Трансформира бележки, имейли и срещи в структуриран отчет за прогреса по проект.',
+   prompt:`Синтезирай следните материали в структуриран отчет за прогрес по проект.
+
+Проект: [НАЗВАНИЕ]
+Период: [от — до]
+Аудитория: [вътрешен екип / борд / донор]
+
+1. СТАТУС — накратко: на ход / с предизвикателства / закъснение
+2. ПОСТИГНАТО — конкретни резултати за периода
+3. В ПРОЦЕС — какво тече в момента
+4. ПРЕДИЗВИКАТЕЛСТВА — честен поглед към трудностите
+5. СЛЕДВАЩИ СТЪПКИ — действия с отговорник и срок
+6. НУЖНА ПОДКРЕПА — нещо, изискващо решение или ресурси
+
+Материали (бележки, имейли, срещи):
+[ПОСТАВИ]`,
+   example:`Имейл 10.10: Срещата с училището мина добре, но директорът иска повече координация.
+Екипна среща: Наемаме нов координатор — трябва онбординг план.
+Имейл 15.10: Получихме потвърждение от 3 от 5-те целеви училища.
+Данни: 47 учители включени, 38 активни, 9 закъснели с модул 2.`,
+   how:``},
+
+  {id:34,cat:'projects',level:'medium',out:'text',tags:['survey','interview'],privacy:false,
+   d4:['description','delegation','discernment','diligence'],
+   d4how:{
+     description:'Дефинирай ясно какво е "успех" за проекта преди анализа. Без това Claude не може да прецени дали резултатите са добри или не.',
+     delegation:'Извличането на уроци от голям масив от данни в края на проект е трудоемко — делегирай структурирането на наученото.',
+     discernment:'Уроците честни ли са? Лесно е да се фокусираме върху успехите. Провери дали предизвикателствата са анализирани достатъчно задълбочено.',
+     diligence:'Запази отчета. Следващия път, когато стартирате подобен проект — подай го на Claude като контекст за по-добро планиране.',
+   },
+   title:'Научени уроци (end-of-project)',
+   desc:'Структурира наученото от приключил проект — за организационна памет и по-добро следващо планиране.',
+   prompt:`Изгради отчет за научени уроци от приключил проект.
+
+Проект: [НАЗВАНИЕ] | Период: [от — до] | Екип: [размер]
+
+1. КОНТЕКСТ — накратко какво беше проектът и целите му
+2. ПОСТИГНАТО — спрямо първоначалните цели (реалистично)
+3. КАКВО РАБОТИ ДОБРЕ — практики за запазване
+4. КАКВО НЕ РАБОТИ — грешки, пропуски, неефективни подходи
+5. ИЗНЕНАДИ — неочаквани предизвикателства или възможности
+6. ПРЕПОРЪКИ — конкретни промени в подхода за следващ проект
+
+Данни:
+[ПОСТАВИ]`,
+   example:`Успяхме да включим всички 5 училища, но с 2 месеца закъснение.
+Комуникацията между координаторите и учителите беше слаба в началото — липсваше ясна структура.
+Онлайн платформата беше изненадващо добре приета — над 80% активни потребители.
+Бюджетът за наем на зали беше подценен с 30%.
+Обратна връзка от екипа: Трябваха ни по-ясни роли от самото начало.`,
+   how:``},
+
+  {id:35,cat:'projects',level:'advanced',out:'text',tags:['scores','survey'],privacy:false,
+   d4:['description','delegation','discernment','diligence'],
+   d4how:{
+     description:'Дай пълен контекст: цели на проекта, индикатори за успех, целеви групи. Колкото по-конкретна е рамката, толкова по-релевантен е анализът.',
+     delegation:'Синтезът на данни от много източници в M&E доклад е комплексна задача — делегирай структурирането и извличането на закономерности.',
+     discernment:'M&E докладите трябва да са честни. Провери дали Claude е балансирал успехите с предизвикателствата и дали препоръките са реалистични.',
+     diligence:'Стандартизирай структурата. Еднакъв формат всяко тримесечие прави сравнението между периоди лесно и смислено.',
+   },
+   title:'M&E доклад — мониторинг и оценка',
+   desc:'Синтезира данни от мониторинг и оценка в структуриран доклад за борд, донори или вътрешни решения.',
+   prompt:`Изгради M&E доклад за [ПРОЕКТ/ПРОГРАМА].
+
+Период: [тримесечие / година]
+Аудитория: [борд / донор / вътрешен екип]
+
+КОЛИЧЕСТВЕНИ ИНДИКАТОРИ:
+[напр. "Целева стойност: 100 учители / Постигнато: 87 (87%)"]
+
+КАЧЕСТВЕНИ ДАННИ:
+[коментари, интервюта, наблюдения]
+
+СТРУКТУРА:
+1. РЕЗЮМЕ — 3 изречения за борд/донор
+2. ПРОГРЕС ПО ИНДИКАТОРИ — цел / постигнато / % / коментар
+3. КАЧЕСТВЕНИ ДОКАЗАТЕЛСТВА — истории и цитати
+4. ОТКЛОНЕНИЯ — какво е под или над целта и защо?
+5. УПРАВЛЕНИЕ НА РИСКА — актуални рискове и мерки
+6. ПРЕПОРЪКИ — корекции в плана за следващия период`,
+   example:`ИНДИКАТОРИ: Учители: цел 100, постигнато 87 (87%) | Завършили модул 1: цел 90%, постигнато 94% | NPS: цел 40, постигнато 48
+КАЧЕСТВЕНИ: Програмата ме накара да преосмисля начина, по който оценявам учениците.
+Предизвикателство: учителите от малки градове имат по-ниска посещаемост поради транспорт.`,
+   how:``},
+
+];
+
+// ─────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────
+function d4BadgeHTML(d4arr){
+  const map={description:{cls:'d4-desc',label:'📝 Description'},delegation:{cls:'d4-deleg',label:'🤝 Delegation'},discernment:{cls:'d4-disc',label:'🔍 Discernment'},diligence:{cls:'d4-dil',label:'⚡ Diligence'}};
+  return d4arr.map(k=>map[k]?`<span class="d4-badge ${map[k].cls}">${map[k].label}</span>`:'').join('');
+}
+function d4HowHTML(d4how){
+  const map={
+    description:{cls:'desc',icon:'📝',label:'Description',sub:'Опиши задачата точно'},
+    delegation: {cls:'deleg',icon:'🤝',label:'Delegation', sub:'Делегирай на AI'},
+    discernment:{cls:'disc', icon:'🔍',label:'Discernment',sub:'Прецени изхода'},
+    diligence:  {cls:'dil',  icon:'⚡',label:'Diligence',  sub:'Итерирай и отговаряй'},
+  };
+  return Object.entries(d4how).map(([k,v])=>{
+    const m=map[k]; if(!m) return '';
+    return `<div class="d4-section ${m.cls}">
+      <div class="d4-header"><span class="d4-icon">${m.icon}</span><span class="d4-label">${m.label}</span><span class="d4-sublabel">— ${m.sub}</span></div>
+      <div class="d4-body">${v}</div>
+    </div>`;
+  }).join('');
+}
+function catClass(c){return{train:'tag-train',alumni:'tag-alumni',fund:'tag-fund',mkt:'tag-mkt',rec:'tag-rec',mixed:'tag-mixed',gen:'tag-gen',part:'tag-part',events:'tag-events',content:'tag-content',projects:'tag-projects'}[c]||'tag-gen';}
+function catLabel(c){return{train:'Обучение',alumni:'Alumni',fund:'Фондонабиране',mkt:'Маркетинг',rec:'Подбор',mixed:'Смесен',gen:'Общ',part:'Партньорства',events:'Събития',content:'Материали',projects:'Проекти'}[c]||c;}
+function outClass(o){return{text:'out-text',table:'out-table',json:'out-json'}[o]||'out-text';}
+function outLabel(o){return{text:'📝 Текст',table:'📊 Таблица',json:'⚙️ JSON'}[o]||o;}
+function lvlDot(l){return{basic:'d-b',medium:'d-m',advanced:'d-a'}[l]||'d-b';}
+function lvlLabel(l){return{basic:'Базов',medium:'Среден',advanced:'Напреднал'}[l]||l;}
+
+// ─────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────
+function renderCards(list){
+  const cc=document.getElementById('cc');
+  const nr=document.getElementById('nr');
+  if(!list.length){cc.innerHTML='';nr.style.display='block';return;}
+  nr.style.display='none';
+  const order=['train','alumni','rec','fund','mkt','part','events','content','projects','mixed'];
+  const labels={train:'Обучение & менторство',alumni:'Alumni програми',rec:'Подбор на учители',fund:'Фондонабиране',mkt:'Маркетинг & комуникации',part:'Партньорства',events:'Събития',content:'Материали за учители',projects:'Проекти & отчетност',mixed:'📊 Смесен анализ — числа + коментари'};
+  let html='';
+  order.forEach(cat=>{
+    const grp=list.filter(p=>p.cat===cat);
+    if(!grp.length) return;
+    html+=`<div class="sec-head">${labels[cat]}</div><div class="cards-grid">`;
+    grp.forEach(p=>{
+      html+=`<div class="card" id="card-${p.id}" data-cat="${p.cat}" data-level="${p.level}" data-out="${p.out}" data-tags="${p.tags.join(',')}" data-d4="${(p.d4||[]).join(',')}">
+        <div class="card-top">
+          <div class="tags">
+            <span class="tag ${catClass(p.cat)}">${catLabel(p.cat)}</span>
+            <span class="out-badge ${outClass(p.out)}">${outLabel(p.out)}</span>
+            ${p.privacy?`<span class="out-badge" style="background:#2e1e1e;color:#e88a7e">🔒 Анон.</span>`:''}
+          </div>
+          <div class="card-acts">
+            <button class="copy-btn" onclick="copyP(event,${p.id})">Копирай</button>
+            <span class="chevron">▾</span>
+          </div>
+        </div>
+        <div class="card-title">${p.title}</div>
+        <div class="card-desc">${p.desc}</div>
+        ${p.privacy?`<span class="priv-flag">⚠️ Анонимизирай преди употреба</span>`:''}
+        <div class="card-body">
+          <div class="tab-row">
+            <button class="tab-btn active" data-tab="prompt" onclick="switchTab(event,${p.id},'prompt')">Промпт</button>
+            <button class="tab-btn" data-tab="example" onclick="switchTab(event,${p.id},'example')">Пример</button>
+            <button class="tab-btn" data-tab="how" onclick="switchTab(event,${p.id},'how')">4D · Как се ползва</button>
+          </div>
+          <div id="tp-${p.id}" class="tab-pane active">
+            <pre class="prompt-pre">${p.prompt.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
+          </div>
+          <div id="te-${p.id}" class="tab-pane">
+            <span class="example-label">Примерни данни — можеш да тестваш с тях</span>
+            <pre class="example-pre">${p.example.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre>
+          </div>
+          <div id="th-${p.id}" class="tab-pane">
+            <div class="how-box" style="padding:0;border:none;background:transparent">${p.d4how?d4HowHTML(p.d4how):`<div style="padding:12px 13px;background:var(--bg4);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text2)">${p.how||''}</div>`}</div>
+          </div>
+        </div>
+        <div class="card-foot">
+          <div class="lvl"><span class="dot ${lvlDot(p.level)}"></span>${lvlLabel(p.level)}</div>
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  cc.innerHTML=html;
+  document.querySelectorAll('.card').forEach(card=>{
+    card.addEventListener('click',function(e){
+      if(e.target.classList.contains('copy-btn')||e.target.classList.contains('tab-btn')) return;
+      this.classList.toggle('expanded');
+    });
+  });
+}
+
+function switchTab(e,id,tab){
+  e.stopPropagation();
+  const card=document.getElementById(`card-${id}`);
+  card.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  card.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById(`t${tab[0]}-${id}`).classList.add('active');
+}
+
+function copyP(e,id){
+  e.stopPropagation();
+  const p=P.find(x=>x.id===id);
+  if(!p) return;
+  navigator.clipboard.writeText(p.prompt).then(()=>{
+    const btn=e.target;
+    btn.textContent='✓ Копирано';
+    btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent='Копирай';btn.classList.remove('ok');},2000);
+  });
+}
+
+// ─────────────────────────────────────────────
+// COUNTS
+// ─────────────────────────────────────────────
+function updateCounts(list){
+  document.getElementById('ca').textContent=list.length;
+  const map={train:'ctr',alumni:'cal',rec:'cre',fund:'cfu',mkt:'cmk',part:'cpa',events:'cev',content:'cco',projects:'cpr',mixed:'cmx'};
+  Object.entries(map).forEach(([cat,elId])=>{
+    const el=document.getElementById(elId);
+    if(el) el.textContent=list.filter(p=>p.cat===cat).length;
+  });
+  document.getElementById('tc').textContent=P.length;
+}
+
+// ─────────────────────────────────────────────
+// FILTER & SEARCH
+// ─────────────────────────────────────────────
+let activeF='all', searchT='';
+function filtered(){
+  return P.filter(p=>{
+    const fMatch=activeF==='all'||p.cat===activeF||p.level===activeF||p.out===activeF||p.tags.includes(activeF);
+    const s=searchT.toLowerCase();
+    const sMatch=!s||p.title.toLowerCase().includes(s)||p.desc.toLowerCase().includes(s)||p.prompt.toLowerCase().includes(s);
+    return fMatch&&sMatch;
+  });
+}
+
+document.querySelectorAll('.fb').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.fb').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');
+    activeF=this.dataset.f;
+    const l=filtered();
+    renderCards(l);
+    updateCounts(l);
+  });
+});
+document.getElementById('search').addEventListener('input',function(){
+  searchT=this.value;
+  const l=filtered();
+  renderCards(l);
+  updateCounts(l);
+});
+
+// ─────────────────────────────────────────────
+// FINDER
+// ─────────────────────────────────────────────
+const finderMap = {
+  'survey+themes':  [1,5,7,11],
+  'survey+why':     [1,16,18],
+  'survey+compare': [19,20],
+  'survey+report':  [4,8,22,25],
+  'survey+recruit': [13,14,15],
+  'scores+themes':  [18,16],
+  'scores+why':     [16,17,18],
+  'scores+compare': [19,20],
+  'scores+report':  [22,25],
+  'scores+recruit': [21],
+  'interview+themes':[2,3,6],
+  'interview+why':  [3,14],
+  'interview+compare':[2,20],
+  'interview+report':[4,25],
+  'interview+recruit':[14,15],
+  'campaign+themes':[10,11],
+  'campaign+why':   [10,12],
+  'campaign+compare':[11,19],
+  'campaign+report':[25,22],
+  'campaign+recruit':[11,21],
+  'numbers+themes': [17,16],
+  'numbers+why':    [17,18,16],
+  'numbers+compare':[19,20],
+  'numbers+report': [22,25],
+  'numbers+recruit':[21],
+};
+let fData='', fGoal='';
+function updateFinder(){
+  if(!fData||!fGoal) return;
+  const key=`${fData}+${fGoal}`;
+  const ids=finderMap[key]||[];
+  const res=document.getElementById('finder-result');
+  const fc=document.getElementById('finder-cards');
+  if(!ids.length){res.classList.remove('show');return;}
+  res.classList.add('show');
+  fc.innerHTML=ids.map(id=>{
+    const p=P.find(x=>x.id===id);
+    if(!p) return '';
+    return `<button class="finder-card-chip" onclick="scrollToCard(${id})">${p.title}</button>`;
+  }).join('');
+}
+function scrollToCard(id){
+  // show all, then scroll
+  activeF='all'; searchT='';
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.fb[data-f="all"]').classList.add('active');
+  const l=filtered();
+  renderCards(l);
+  updateCounts(l);
+  setTimeout(()=>{
+    const el=document.getElementById(`card-${id}`);
+    if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('expanded');}
+  },100);
+}
+document.getElementById('f-data').querySelectorAll('.finder-btn').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    document.getElementById('f-data').querySelectorAll('.finder-btn').forEach(b=>b.classList.remove('sel'));
+    this.classList.add('sel');
+    fData=this.dataset.val;
+    updateFinder();
+  });
+});
+document.getElementById('f-goal').querySelectorAll('.finder-btn').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    document.getElementById('f-goal').querySelectorAll('.finder-btn').forEach(b=>b.classList.remove('sel'));
+    this.classList.add('sel');
+    fGoal=this.dataset.val;
+    updateFinder();
+  });
+});
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+renderCards(P);
+updateCounts(P);
+</script>
+</body>
+</html>
